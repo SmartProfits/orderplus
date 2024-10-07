@@ -42,6 +42,26 @@
             background-color: #075e54; /* 深色WhatsApp绿色 */
             color: #e0e0e0; /* 按钮字体颜色 */
         }
+/* 为每个商品项设置 flexbox 布局 */
+#productList div {
+    display: flex;
+    justify-content: space-between; /* 商品名称和输入框分布两侧 */
+    align-items: center; /* 垂直居中对齐 */
+    margin-bottom: 15px; /* 保持每个商品项之间的间距 */
+}
+
+/* 商品名称部分自适应占据左边空间 */
+#productList label {
+    flex-grow: 1; /* 自动扩展，占据可用空间 */
+    margin-right: 10px; /* 给输入框预留间距 */
+}
+
+/* 调整输入框大小并对齐右边 */
+input[type="number"] {
+    width: 80px;
+    margin-left: 10px;
+    text-align: right; /* 使数字靠右显示 */
+}
 
         h1 {
             font-size: 2.5rem;
