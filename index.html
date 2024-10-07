@@ -20,6 +20,13 @@
             background-color: #1c1c1c; /* 深灰色背景 */
             color: #e0e0e0; /* 浅色字体 */
         }
+	/* 添加一个容器类来包含目录的label */
+.category-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 每行3列，每列平分宽度 */
+    gap: 10px; /* 项目之间的间距 */
+    margin-bottom: 20px;
+}
 
         body.dark-mode #result {
             background-color: #333; /* 黑暗模式下的结果框颜色 */
@@ -142,15 +149,16 @@
     </div>
 
     <h3>选择目录</h3>
-    <div>
-        <label><input type="radio" name="category" value="BanHeang" onclick="showCategory()">BanHeang</label>
-        <label><input type="radio" name="category" value="HopHup" onclick="showCategory()">HopHup</label>
-        <label><input type="radio" name="category" value="Chocolate" onclick="showCategory()">Chocolate</label>
-        <label><input type="radio" name="category" value="Sotong" onclick="showCategory()">Sotong</label>
-        <label><input type="radio" name="category" value="Coffee" onclick="showCategory()">Coffee</label>
-        <label><input type="radio" name="category" value="Amplang" onclick="showCategory()">Amplang</label>
-        <label><input type="radio" name="category" value="Other" onclick="showCategory()">Other</label>
-    </div>
+<div class="category-container">
+    <label><input type="radio" name="category" value="BanHeang" onclick="showCategory()">BanHeang</label>
+    <label><input type="radio" name="category" value="HopHup" onclick="showCategory()">HopHup</label>
+    <label><input type="radio" name="category" value="Chocolate" onclick="showCategory()">Chocolate</label>
+    <label><input type="radio" name="category" value="Sotong" onclick="showCategory()">Sotong</label>
+    <label><input type="radio" name="category" value="Coffee" onclick="showCategory()">Coffee</label>
+    <label><input type="radio" name="category" value="Amplang" onclick="showCategory()">Amplang</label>
+    <label><input type="radio" name="category" value="Other" onclick="showCategory()">Other</label>
+</div>
+
 
     <h3>选择商品（没输入数量默认是1）</h3>
     <div id="productList"></div>
