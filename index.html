@@ -189,8 +189,7 @@ input[type="number"] {
         <label><input type="radio" name="store" value="*Ole-Ole*" onclick="toggleItems()"> Ole-Ole</label>
     </div>
 
-    <h3>选择目录</h3> <input type="text" id="productSearch" placeholder="搜索商品..." oninput="searchProduct()" autocomplete="off">
-<div id="suggestions"></div> <!-- 用于显示自动补全的结果 -->
+    <h3>选择目录</h3>
 
 <div class="category-container">
     <label><input type="radio" name="category" value="BanHeang" onclick="showCategory()">BanHeang</label>
@@ -200,9 +199,11 @@ input[type="number"] {
     <label><input type="radio" name="category" value="Coffee" onclick="showCategory()">Coffee</label>
     <label><input type="radio" name="category" value="Amplang" onclick="showCategory()">Amplang</label>
     <label><input type="radio" name="category" value="Other" onclick="showCategory()">Other</label>
+    
 </div>
 
-
+<input type="text" id="productSearch" placeholder="搜索商品..." oninput="searchProduct()" autocomplete="off">
+<div id="suggestions"></div>
     <h3>选择商品（没输入数量默认是1）</h3>
     <div id="productList"></div>
 
