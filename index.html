@@ -168,7 +168,9 @@ input[type="number"] {
         <label><input type="radio" name="store" value="*Ole-Ole*" onclick="toggleItems()"> Ole-Ole</label>
     </div>
 
-    <h3>选择目录</h3>
+    <h3>选择目录</h3> <input type="text" id="productSearch" placeholder="搜索商品..." oninput="searchProduct()" autocomplete="off">
+<div id="suggestions"></div> <!-- 用于显示自动补全的结果 -->
+
 <div class="category-container">
     <label><input type="radio" name="category" value="BanHeang" onclick="showCategory()">BanHeang</label>
     <label><input type="radio" name="category" value="HopHup" onclick="showCategory()">HopHup</label>
@@ -453,6 +455,51 @@ input[type="number"] {
                 localStorage.setItem('dark-mode', 'disabled');
             }
         }
+        function searchProduct() {
+    const searchText = document.getElementById('productSearch').value.toLowerCase();
+    const suggestionsContainer = document.getElementById('suggestions');
+    suggestionsContainer.innerHTML = ''; // 清空之前的建议
+
+    if (searchText.length === 0) return; // 如果没有输入，不显示建议
+
+    // 获取所有分类中的商品
+    const allProducts = Object.values(categories).flat();
+
+    // 根据输入的内容筛选出匹配的商品
+    const matchingProducts = allProducts.filter(product => product.name.toLowerCase().includes(searchText));
+
+    // 显示匹配的商品作为建议
+    matchingProducts.forEach(product => {
+        const div = document.createElement('div');
+        div.textContent = product.name;
+        div.onclick = () => selectProduct(product); // 点击建议后选择该商品
+        suggestionsContainer.appendChild(div);
+    });
+}
+
+function selectProduct(product) {
+    const productSearch = document.getElementById('productSearch');
+    productSearch.value = product.name; // 将选中的商品名称填充到搜索框中
+
+    const productList = document.getElementById('productList');
+    productList.innerHTML = ''; // 清空之前的商品列表
+
+    // 生成选中的商品输入框
+    const div = document.createElement('div');
+    div.innerHTML = `
+        <input type="checkbox" id="item${product.id}" checked onchange="saveItem(${product.id}, '${product.name}')">
+        <label for="item${product.id}">${product.name}</label>
+        <input type="number" id="quantity${product.id}" min="1" value="1" onchange="saveQuantity(${product.id})">
+    `;
+    productList.appendChild(div);
+    
+    // 记录选中的商品
+    saveItem(product.id, product.name);
+    
+    // 清空建议
+    document.getElementById('suggestions').innerHTML = '';
+}
+
     </script>
 <p class="contact-info">If you have any questions or need to add new products, please contact me (Mark).</p>
     
