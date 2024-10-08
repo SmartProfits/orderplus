@@ -290,17 +290,17 @@ input[type="number"] {
                 { id: 94, name: "Musang King Durian Candy" }
             ],
             Chocolate: [
-                { id: 108, name: "AD Chocolate Durian" },
-                { id: 109, name: "AD Chocolate Sabah Tea" },
-                { id: 110, name: "AD Chocolate Mango" },
-                { id: 111, name: "AD Chocolate Chili" },
-                { id: 112, name: "AD Chocolate Dark" },
-                { id: 113, name: "AD Chocolate Coffee" },
-                { id: 114, name: "AD Chocolate Banana" },
-                { id: 115, name: "AD Chocolate Tiramisu" },
-                { id: 116, name: "AD Chocolate Mint" },
-                { id: 117, name: "AD Chocolate Rambutan" },
-                { id: 118, name: "AD Chocolate Soursup" }
+                { id: 108, name: "AD Chocolate Durian", unit: 'pc'},
+                { id: 109, name: "AD Chocolate Sabah Tea", unit: 'pc'},
+                { id: 110, name: "AD Chocolate Mango", unit: 'pc'},
+                { id: 111, name: "AD Chocolate Chili", unit: 'pc'},
+                { id: 112, name: "AD Chocolate Dark", unit: 'pc'},
+                { id: 113, name: "AD Chocolate Coffee", unit: 'pc'},
+                { id: 114, name: "AD Chocolate Banana", unit: 'pc'},
+                { id: 115, name: "AD Chocolate Tiramisu", unit: 'pc'},
+                { id: 116, name: "AD Chocolate Mint", unit: 'pc'},
+                { id: 117, name: "AD Chocolate Rambutan", unit: 'pc'},
+                { id: 118, name: "AD Chocolate Soursup", unit: 'pc'}
             ],
             Sotong: [
                 { id: 85, name: "Cuttlefish Red" },
@@ -421,27 +421,30 @@ input[type="number"] {
             toggleItems(); // 确保激活商品选择框
         }
 
-        function generateText() {
-            let result = '';
-            let selectedStore = document.querySelector('input[name="store"]:checked');
-            if (selectedStore) {
-                result += 'Kedai: ' + selectedStore.value + '\n\n';
-            } else {
-                result += 'Kedai: 未选择\n';
-            }
+function generateText() {
+    let result = '';
+    let selectedStore = document.querySelector('input[name="store"]:checked');
+    if (selectedStore) {
+        result += 'Kedai: ' + selectedStore.value + '\n\n';
+    } else {
+        result += 'Kedai: 未选择\n';
+    }
 
-            // 遍历所有已选择的产品
-            for (const [id, quantity] of Object.entries(selectedItems)) {
-                const product = Object.values(categories).flat().find(p => p.id == id);
-                if (product) {
-                    result += product.name + ' - ' + quantity + ' ctn\n';
-                }
-            }
-
-            result += '\nAirport Stock Order: smartprofits.github.io/order/';
-            document.getElementById('result').innerText = result;
-            return result;
+    // 遍历所有已选择的产品
+    for (const [id, quantity] of Object.entries(selectedItems)) {
+        const product = Object.values(categories).flat().find(p => p.id == id);
+        if (product) {
+            // 根据商品的 unit 属性决定是显示 "pc" 还是 "ctn"
+            const unit = product.unit === 'pc' ? 'pc' : 'ctn';
+            result += product.name + ' - ' + quantity + ' ' + unit + '\n';
         }
+    }
+
+    result += '\nAirport Stock Order: smartprofits.github.io/order/';
+    document.getElementById('result').innerText = result;
+    return result;
+}
+
 
         function copyAndSendWhatsApp() {
             let text = generateText();
