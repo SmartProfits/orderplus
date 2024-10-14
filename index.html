@@ -288,7 +288,7 @@ input[type="number"] {
                 { id: 83, name: "Salted Egg Fish Skin Spicy" },
                 { id: 84, name: "Salted Egg Salmon Skin" },
                 { id: 94, name: "Musang King Durian Candy" },
-                { id: 126, name: "HT Dried Fruit Mango 📌" }
+                { id: 126, name: "HT Dried Fruit Mango " }
             ],
             Chocolate: [
                 { id: 108, name: "AD Chocolate Durian", unit: 'pc'},
@@ -332,7 +332,7 @@ input[type="number"] {
                 { id: 100, name: "Kopi Tenom Gold" },
                 { id: 101, name: "Kopi Tenom Blue" },
                 { id: 102, name: "Kopi Tenom Green" },
-                { id: 125, name: "Kopi Tenom Red 📌" }
+                { id: 125, name: "Kopi Tenom Red " }
             ],
             Amplang: [
                 { id: 96, name: "Amplang Ikan" },
@@ -439,7 +439,7 @@ function generateText() {
         const product = Object.values(categories).flat().find(p => p.id == id);
         if (product) {
             // 根据商品的 unit 属性决定是显示 "pc" 还是 "ctn"
-            const unit = product.unit === 'pc' ? 'pc' : 'ctn';
+            const unit = product.unit === 'pc' ? 'pc' : '📦';
             result += product.name + ' - ' + quantity + ' ' + unit + '\n';
         }
     }
@@ -529,6 +529,56 @@ function selectProduct(product) {
     
     // 清空建议
     document.getElementById('suggestions').innerHTML = '';
+}
+// 定义语言包
+const translations = {
+    en: {
+        title: "Stock Order",
+        chooseStore: "Choose Store",
+        chooseCategory: "Choose Category",
+        selectProducts: "Select Products (default quantity is 1)",
+        generateText: "Generate Text",
+        copyAndSend: "Copy and Send to WhatsApp",
+        switchMode: "Switch to Dark Mode",
+        contactInfo: "If you have any questions or need to add new products, please contact me (Mark)."
+    },
+    zh: {
+        title: "库存订单",
+        chooseStore: "选择店铺",
+        chooseCategory: "选择目录",
+        selectProducts: "选择商品（没输入数量默认是1）",
+        generateText: "生成文字",
+        copyAndSend: "复制并发送至WhatsApp",
+        switchMode: "切换至黑暗模式",
+        contactInfo: "如果您有任何问题或需要添加新产品，请联系我（Mark）。"
+    }
+};
+
+// 获取用户的首选语言
+const userLang = navigator.language || navigator.userLanguage;
+const langCode = userLang.startsWith('zh') ? 'zh' : 'en'; // 检查是否为中文，默认为英文
+
+// 设置页面文本内容
+function setLanguage(lang) {
+    document.querySelector('h1').textContent = translations[lang].title;
+    document.querySelector('h3:nth-of-type(1)').textContent = translations[lang].chooseStore;
+    document.querySelector('h3:nth-of-type(2)').textContent = translations[lang].chooseCategory;
+    document.querySelector('h3:nth-of-type(3)').textContent = translations[lang].selectProducts;
+    document.querySelector('.toggle-mode-btn').textContent = translations[lang].switchMode;
+    document.querySelector('.whatsapp-button').textContent = translations[lang].copyAndSend;
+    document.querySelector('.contact-info').textContent = translations[lang].contactInfo;
+    document.querySelector('button:nth-of-type(2)').textContent = translations[lang].generateText;
+}
+
+// 在页面加载时设置默认语言
+window.onload = function () {
+    setLanguage(langCode);
+    const savedMode = localStorage.getItem('dark-mode');
+    if (savedMode === 'enabled') {
+        document.body.classList.add('dark-mode');
+        document.querySelector('.toggle-mode-btn').textContent = langCode === 'zh' ? '切换至正常模式' : 'Switch to Light Mode';
+    }
+    toggleItems(); // 初始化商品选择框
 }
 
     </script>
