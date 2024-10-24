@@ -5,230 +5,228 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Airport Stock Request</title>
 		<style>
-			        body {
-			            font-family: Arial, sans-serif;
-			            padding: 15px;
-			            margin: 0;
-			            background-color: #FBFCFC; /* 柔和的浅灰背景 */
-			            color: #333; /* 深色字体提升对比度 */
-			            transition: background-color 0.3s, color 0.3s; /* 添加过渡效果 */
-			        }
+						        body {
+						            font-family: Arial, sans-serif;
+						            padding: 15px;
+						            margin: 0;
+						            background-color: #FCEEDD; /* 柔和的浅灰背景 */
+						            color: #333; /* 深色字体提升对比度 */
+						            transition: background-color 0.3s, color 0.3s; /* 添加过渡效果 */
+						        }
 
 
-			        /* 黑暗模式 */
-			        body.dark-mode {
-			            background-color: #1c1c1c; /* 深灰色背景 */
-			            color: #e0e0e0; /* 浅色字体 */
-			        }
+						        /* 黑暗模式 */
+						        body.dark-mode {
+						            background-color: #1c1c1c; /* 深灰色背景 */
+						            color: #e0e0e0; /* 浅色字体 */
+						        }
 
-			        /* 添加一个容器类来包含目录的label */
-			        .category-container {
-			            display: grid;
-			            grid-template-columns: repeat(3, 1fr); /* 每行3列，每列平分宽度 */
-			            gap: 10px; /* 项目之间的间距 */
-			            margin-bottom: 20px;
-			        }
+						        /* 添加一个容器类来包含目录的label */
+						        .category-container {
+						            display: grid;
+						            grid-template-columns: repeat(3, 1fr); /* 每行3列，每列平分宽度 */
+						            gap: 10px; /* 项目之间的间距 */
+						            margin-bottom: 20px;
+						        }
 
-			        body.dark-mode #result {
-			            background-color: #333; /* 黑暗模式下的结果框颜色 */
-			            color: #e0e0e0; /* 浅色字体 */
-			        }
+						        body.dark-mode #result {
+						            background-color: #333; /* 黑暗模式下的结果框颜色 */
+						            color: #e0e0e0; /* 浅色字体 */
+						        }
 
-			        body.dark-mode button {
-			            background-color: #444; /* 按钮背景颜色 */
-			            color: #e0e0e0; /* 按钮字体颜色 */
-			        }
+						        body.dark-mode button {
+						            background-color: #444; /* 按钮背景颜色 */
+						            color: #e0e0e0; /* 按钮字体颜色 */
+						        }
 
-			        body.dark-mode .whatsapp-button {
-			            background-color: #075e54; /* 深色WhatsApp绿色 */
-			            color: #e0e0e0; /* 按钮字体颜色 */
-			        }
+						        body.dark-mode .whatsapp-button {
+						            background-color: #075e54; /* 深色WhatsApp绿色 */
+						            color: #e0e0e0; /* 按钮字体颜色 */
+						        }
 
-			        /* 为每个商品项设置 flexbox 布局 */
-			        #productList div {
-			            display: flex;
-			            justify-content: space-between; /* 商品名称和输入框分布两侧 */
-			            align-items: center; /* 垂直居中对齐 */
-			            margin-bottom: 15px; /* 保持每个商品项之间的间距 */
-			        }
+						        /* 为每个商品项设置 flexbox 布局 */
+						        #productList div {
+						            display: flex;
+						            justify-content: space-between; /* 商品名称和输入框分布两侧 */
+						            align-items: center; /* 垂直居中对齐 */
+						            margin-bottom: 15px; /* 保持每个商品项之间的间距 */
+						        }
 
-			        /* 商品名称部分自适应占据左边空间 */
-			        #productList label {
-			            flex-grow: 1; /* 自动扩展，占据可用空间 */
-			            margin-right: 10px; /* 给输入框预留间距 */
+						        /* 商品名称部分自适应占据左边空间 */
+						        #productList label {
+						            flex-grow: 1; /* 自动扩展，占据可用空间 */
+						            margin-right: 10px; /* 给输入框预留间距 */
 
 
-			        }
+						        }
 
-			        #suggestions {
-			            border: 1px solid #ccc;
-			            max-height: 150px;
-			            overflow-y: auto;
-			            background-color: white;
-			            position: absolute;
-			            width: 220px;
-			            z-index: 10;
-			        }
+						        #suggestions {
+						            border: 1px solid #ccc;
+						            max-height: 150px;
+						            overflow-y: auto;
+						            background-color: white;
+						            position: absolute;
+						            width: 220px;
+						            z-index: 10;
+						        }
 
-			        #suggestions div {
-			    padding: 4px; /* 调整上下的 padding 来减少间隔 */
-			    line-height: 0.6; /* 调小 line-height 以减少上下间距 */
-			    cursor: pointer;
-			    color: #333; /* 设置字体颜色为深灰色 */
+						        #suggestions div {
+						    padding: 4px; /* 调整上下的 padding 来减少间隔 */
+						    line-height: 0.6; /* 调小 line-height 以减少上下间距 */
+						    cursor: pointer;
+						    color: #333; /* 设置字体颜色为深灰色 */
+						}
+
+						}
+
+
+						        #suggestions div:hover {
+						            background-color: #f0f0f0;
+						        }
+
+						        /* 调整输入框大小并对齐右边 */
+						        input[type="number"] {
+						            width: 80px;
+						            margin-left: 10px;
+						            text-align: right; /* 使数字靠右显示 */
+						        }
+						        #productSearch {
+						    width: 210px; /* 调整为100%以适应容器宽度 */
+						    padding: 5px; /* 增加内边距以增大点击区域 */
+						    font-size: 1.2rem; /* 调整字体大小 */
+						    border-radius: 5px; /* 使边框圆润 */
+						    border: 1px solid #ccc; /* 设置边框颜色 */
+						}
+
+						        h1 {
+						            font-size: 2.5rem;
+						            font-weight: bold;
+						            text-align: center;
+						            margin-bottom: 110px;
+						        }
+
+						        #result {
+						            width: 100%;
+						            height: 150px;
+						            border: 1px solid #ccc;
+						            padding: 10px;
+						            margin-top: 10px;
+						            white-space: pre-wrap;
+						            overflow: auto;
+						            font-size: 1.1rem;
+						            background-color: #fff;
+						            border-radius: 8px;
+						        }
+
+						        div {
+						            margin-bottom: 15px;
+						        }
+
+						        label {
+						            font-size: 1.1rem;
+						        }
+
+						        input[type="number"], input[type="checkbox"] {
+						            font-size: 1rem;
+						        }
+
+						        button {
+						            padding: 12px 18px;
+						            font-size: 1.1rem;
+						            margin: 10px 0;
+						            cursor: pointer;
+						            width: 100%;
+						            border: none;
+						            border-radius: 8px;
+						        }
+
+						        /* WhatsApp 绿色按钮样式 */
+						        .whatsapp-button {
+						            background-color: #25D366; /* WhatsApp绿色 */
+						            color: white; /* 白色文字 */
+						        }
+
+						        /* 切换模式按钮样式 */
+						        .toggle-mode-btn {
+						            background-color: #007bff;
+						            color: white;
+						            padding: 10px 20px;
+						            margin-bottom: 20px;
+						            cursor: pointer;
+						            border: none;
+						            border-radius: 5px;
+						            font-size: 1rem;
+						        }
+
+						        .contact-info {
+						            font-size: 1rem;
+						            font-style: italic;
+						            color: #555; /* 稍微浅一点的颜色 */
+						            text-align: center;
+						            background-color: #f9f9f9; /* 柔和的背景色 */
+						            padding: 10px;
+						            border-radius: 8px;
+						            margin-bottom: 20px; /* 增加与下方内容的间距 */
+						            border: 1px solid #ddd; /* 添加浅色边框 */
+						        }
+
+						        @media (max-width: 768px) {
+						            h1 {
+						                font-size: 3rem;
+						            }
+
+						            body {
+						                padding: 10px;
+						            }
+
+						            button {
+						                padding: 10px 15px;
+						            }
+						        }
+
+						        .quantity-btn {
+						            width: 30px;
+						            height: 30px;
+						            border: none;
+						            border-radius: 50%; /* 圆形按钮 */
+						            cursor: pointer;
+						            font-size: 1.2rem;
+						            display: inline-flex;
+						            justify-content: center;
+						            align-items: center;
+						        }
+
+						        .quantity-btn:nth-child(3) {
+						            background-color: #4CAF50 ; /* 青色 */
+						            color: white;
+						        }
+
+						        .quantity-btn:nth-child(5) {
+						            background-color: #F44336; /* 红色 */
+						            color: white;
+						        }
+			                    .quantity-btn:hover {
+			    transform: scale(1.1); /* 放大按钮 */
+			    transition: transform 0.2s ease; /* 添加过渡效果 */
+			}
+			.quantity-btn:active {
+			    transform: scale(0.95); /* 按下时缩小按钮 */
+			    transition: transform 0.1s ease;
+			}
+			.quantity-btn {
+			    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+			}
+			.quantity-btn {
+			    transition: background-color 0.3s ease, color 0.3s ease;
 			}
 
-			}
 
-
-			        #suggestions div:hover {
-			            background-color: #f0f0f0;
-			        }
-
-			        /* 调整输入框大小并对齐右边 */
-			        input[type="number"] {
-			            width: 80px;
-			            margin-left: 10px;
-			            text-align: right; /* 使数字靠右显示 */
-			        }
-			        #productSearch {
-			    width: 210px; /* 调整为100%以适应容器宽度 */
-			    padding: 5px; /* 增加内边距以增大点击区域 */
-			    font-size: 1.2rem; /* 调整字体大小 */
-			    border-radius: 5px; /* 使边框圆润 */
-			    border: 1px solid #ccc; /* 设置边框颜色 */
-			}
-
-			        h1 {
-			            font-size: 2.5rem;
-			            font-weight: bold;
-			            text-align: center;
-			            margin-bottom: 110px;
-			        }
-
-			        #result {
-			            width: 100%;
-			            height: 150px;
-			            border: 1px solid #ccc;
-			            padding: 10px;
-			            margin-top: 10px;
-			            white-space: pre-wrap;
-			            overflow: auto;
-			            font-size: 1.1rem;
-			            background-color: #fff;
-			            border-radius: 8px;
-			        }
-
-			        div {
-			            margin-bottom: 15px;
-			        }
-
-			        label {
-			            font-size: 1.1rem;
-			        }
-
-			        input[type="number"], input[type="checkbox"] {
-			            font-size: 1rem;
-			        }
-
-			        button {
-			            padding: 12px 18px;
-			            font-size: 1.1rem;
-			            margin: 10px 0;
-			            cursor: pointer;
-			            width: 100%;
-			            border: none;
-			            border-radius: 8px;
-			        }
-
-			        /* WhatsApp 绿色按钮样式 */
-			        .whatsapp-button {
-			            background-color: #25D366; /* WhatsApp绿色 */
-			            color: white; /* 白色文字 */
-			        }
-
-			        /* 切换模式按钮样式 */
-			        .toggle-mode-btn {
-			            background-color: #007bff;
-			            color: white;
-			            padding: 10px 20px;
-			            margin-bottom: 20px;
-			            cursor: pointer;
-			            border: none;
-			            border-radius: 5px;
-			            font-size: 1rem;
-			        }
-
-			        .contact-info {
-			            font-size: 1rem;
-			            font-style: italic;
-			            color: #555; /* 稍微浅一点的颜色 */
-			            text-align: center;
-			            background-color: #f9f9f9; /* 柔和的背景色 */
-			            padding: 10px;
-			            border-radius: 8px;
-			            margin-bottom: 20px; /* 增加与下方内容的间距 */
-			            border: 1px solid #ddd; /* 添加浅色边框 */
-			        }
-
-			        @media (max-width: 768px) {
-			            h1 {
-			                font-size: 3rem;
-			            }
-
-			            body {
-			                padding: 10px;
-			            }
-
-			            button {
-			                padding: 10px 15px;
-			            }
-			        }
-
-			        .quantity-btn {
-			            width: 30px;
-			            height: 30px;
-			            border: none;
-			            border-radius: 50%; /* 圆形按钮 */
-			            cursor: pointer;
-			            font-size: 1.2rem;
-			            display: inline-flex;
-			            justify-content: center;
-			            align-items: center;
-			        }
-
-			        .quantity-btn:nth-child(3) {
-			            background-color: #4CAF50 ; /* 青色 */
-			            color: white;
-			        }
-
-			        .quantity-btn:nth-child(5) {
-			            background-color: #F44336; /* 红色 */
-			            color: white;
-			        }
-                    .quantity-btn:hover {
-    transform: scale(1.1); /* 放大按钮 */
-    transition: transform 0.2s ease; /* 添加过渡效果 */
-}
-.quantity-btn:active {
-    transform: scale(0.95); /* 按下时缩小按钮 */
-    transition: transform 0.1s ease;
-}
-.quantity-btn {
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-.quantity-btn {
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-
-                    input[type="number"] {
-    width: 40px; /* 你可以根据需要调整为任何合适的大小 */
-    padding: 5px; /* 调整内边距以使输入框看起来更舒适 */
-    margin-left: 10px; /* 留出与其他元素的间距 */
-    text-align: right; /* 保持数字靠右对齐 */
-   }
-   
-
+			                    input[type="number"] {
+			    width: 40px; /* 你可以根据需要调整为任何合适的大小 */
+			    padding: 5px; /* 调整内边距以使输入框看起来更舒适 */
+			    margin-left: 10px; /* 留出与其他元素的间距 */
+			    text-align: right; /* 保持数字靠右对齐 */
+			   }
 		</style>
 	</head>
 	<body>
@@ -479,20 +477,6 @@
 			                quantities.forEach(quantity => quantity.disabled = true);
 			            }
 			        }
-			        function increaseQuantity(productId) {
-			    const specificProducts = [108, 109, 110]; // 需要增加 50 的产品 ID 列表
-			    const product = getProductById(productId); // 假设有这个函数可以根据 ID 获取商品
-
-			    if (product) {
-			        if (specificProducts.includes(productId)) {
-			            product.quantity += 50; // 对特定产品增加 50
-			        } else {
-			            product.quantity += 1; // 对其他产品正常增加 1
-			        }
-			        updateProductDisplay(product); // 更新显示
-			    }
-			}
-
 
 			        function showCategory() {
 			            let selectedCategory = document.querySelector('input[name="category"]:checked');
@@ -624,45 +608,9 @@
 			    // 清空建议
 			    document.getElementById('suggestions').innerHTML = '';
 			}
-			// 定义语言包
-			const translations = {
-			    en: {
-			        title: "Stock Order",
-			        chooseStore: "Choose Store",
-			        chooseCategory: "Choose Category",
-			        selectProducts: "Select Products (default quantity is 1)",
-			        generateText: "Generate Text",
-			        copyAndSend: "Copy and Send to WhatsApp",
-			        switchMode: "Switch to Dark Mode",
-			        contactInfo: "If you have any questions or need to add new products, please contact me (Mark)."
-			    },
-			    zh: {
-			        title: "库存订单",
-			        chooseStore: "选择店铺",
-			        chooseCategory: "选择目录",
-			        selectProducts: "选择商品（没输入数量默认是1）",
-			        generateText: "生成文字",
-			        copyAndSend: "复制并发送至WhatsApp",
-			        switchMode: "切换至黑暗模式",
-			        contactInfo: "如果您有任何问题或需要添加新产品，请联系我（Mark）。"
-			    }
-			};
 
-			// 获取用户的首选语言
-			const userLang = navigator.language || navigator.userLanguage;
-			const langCode = userLang.startsWith('zh') ? 'zh' : 'en'; // 检查是否为中文，默认为英文
 
-			// 设置页面文本内容
-			function setLanguage(lang) {
-			    document.querySelector('h1').textContent = translations[lang].title;
-			    document.querySelector('h3:nth-of-type(1)').textContent = translations[lang].chooseStore;
-			    document.querySelector('h3:nth-of-type(2)').textContent = translations[lang].chooseCategory;
-			    document.querySelector('h3:nth-of-type(3)').textContent = translations[lang].selectProducts;
-			    document.querySelector('.toggle-mode-btn').textContent = translations[lang].switchMode;
-			    document.querySelector('.whatsapp-button').textContent = translations[lang].copyAndSend;
-			    document.querySelector('.contact-info').textContent = translations[lang].contactInfo;
-			    document.querySelector('button:nth-of-type(2)').textContent = translations[lang].generateText;
-			}
+
 
 			// 在页面加载时设置默认语言
 			window.onload = function () {
