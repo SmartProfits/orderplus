@@ -197,20 +197,37 @@
 			        }
 
 			        .quantity-btn:nth-child(3) {
-			            background-color: #00BFFF; /* 青色 */
+			            background-color: #4CAF50 ; /* 青色 */
 			            color: white;
 			        }
 
 			        .quantity-btn:nth-child(5) {
-			            background-color: #FF4500; /* 红色 */
+			            background-color: #F44336; /* 红色 */
 			            color: white;
 			        }
+                    .quantity-btn:hover {
+    transform: scale(1.1); /* 放大按钮 */
+    transition: transform 0.2s ease; /* 添加过渡效果 */
+}
+.quantity-btn:active {
+    transform: scale(0.95); /* 按下时缩小按钮 */
+    transition: transform 0.1s ease;
+}
+.quantity-btn {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.quantity-btn {
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+
                     input[type="number"] {
     width: 40px; /* 你可以根据需要调整为任何合适的大小 */
     padding: 5px; /* 调整内边距以使输入框看起来更舒适 */
     margin-left: 10px; /* 留出与其他元素的间距 */
     text-align: right; /* 保持数字靠右对齐 */
-}
+   }
+   
 
 		</style>
 	</head>
