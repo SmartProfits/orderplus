@@ -306,21 +306,22 @@
                 { id: 94, name: "Musang King Durian Candy" },
                 { id: 126, name: "HT Dried Fruit Mango " }
             ],
-            Chocolate: [
-                { id: 108, name: "AD Chocolate Durian", unit: 'pc'},
-                { id: 109, name: "AD Chocolate Sabah Tea", unit: 'pc'},
-                { id: 110, name: "AD Chocolate Mango", unit: 'pc'},
-                { id: 111, name: "AD Chocolate Chili", unit: 'pc'},
-                { id: 112, name: "AD Chocolate Dark", unit: 'pc'},
-                { id: 113, name: "AD Chocolate Coffee", unit: 'pc'},
-                { id: 114, name: "AD Chocolate Banana", unit: 'pc'},
-                { id: 115, name: "AD Chocolate Tiramisu", unit: 'pc'},
-                { id: 116, name: "AD Chocolate Mint", unit: 'pc'},
-                { id: 117, name: "AD Chocolate Rambutan", unit: 'pc'},
-                { id: 118, name: "AD Chocolate Soursup", unit: 'pc'},
-                { id: 127, name: "AD Chocolate Coconut", unit: 'pc'},
-                { id: 128, name: "AD Chocolate Mangosteen", unit: 'pc'}
-            ],
+           Chocolate: [
+    { id: 108, name: "AD Chocolate Durian", unit: 'pc', defaultQuantity: 50 },
+    { id: 109, name: "AD Chocolate Sabah Tea", unit: 'pc', defaultQuantity: 50 },
+    { id: 110, name: "AD Chocolate Mango", unit: 'pc', defaultQuantity: 50 },
+    { id: 111, name: "AD Chocolate Chili", unit: 'pc', defaultQuantity: 50 },
+    { id: 112, name: "AD Chocolate Dark", unit: 'pc', defaultQuantity: 50 },
+    { id: 113, name: "AD Chocolate Coffee", unit: 'pc', defaultQuantity: 50 },
+    { id: 114, name: "AD Chocolate Banana", unit: 'pc', defaultQuantity: 50 },
+    { id: 115, name: "AD Chocolate Tiramisu", unit: 'pc', defaultQuantity: 50 },
+    { id: 116, name: "AD Chocolate Mint", unit: 'pc', defaultQuantity: 50 },
+    { id: 117, name: "AD Chocolate Rambutan", unit: 'pc', defaultQuantity: 50 },
+    { id: 118, name: "AD Chocolate Soursup", unit: 'pc', defaultQuantity: 50 },
+    { id: 127, name: "AD Chocolate Coconut", unit: 'pc', defaultQuantity: 50 },
+    { id: 128, name: "AD Chocolate Mangosteen", unit: 'pc', defaultQuantity: 50 }
+],
+
             Sotong: [
                 { id: 85, name: "Cuttlefish Red" },
                 { id: 86, name: "Cuttlefish Lemon" },
@@ -372,26 +373,32 @@
         let selectedItems = {};
 
         function loadProducts(products) {
-            const productList = document.getElementById('productList');
-            productList.innerHTML = ''; // 清空之前的商品列表
+    const productList = document.getElementById('productList');
+    productList.innerHTML = ''; // 清空之前的商品列表
 
-            products.forEach(product => {
-                const div = document.createElement('div');
-                div.innerHTML = `
-                    <input type="checkbox" id="item${product.id}" onchange="saveItem(${product.id}, '${product.name}')">
-                    <label for="item${product.id}">${product.name}</label>
-                    <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)">+</button>
-                    <input type="number" id="quantity${product.id}" min="1" value="1" onchange="saveQuantity(${product.id})">
-                    <button class="quantity-btn" onclick="changeQuantity(${product.id}, -1)">-</button>
-                `;
-                productList.appendChild(div);
+    products.forEach(product => {
+        // 确定商品的默认数量，如果存在 defaultQuantity 则使用它，否则默认为 1
+        const defaultQuantity = product.defaultQuantity || 1;
 
-                if (selectedItems[product.id]) {
-                    document.getElementById('item' + product.id).checked = true;
-                    document.getElementById('quantity' + product.id).value = selectedItems[product.id];
-                }
-            });
+        const div = document.createElement('div');
+        div.innerHTML = `
+            <input type="checkbox" id="item${product.id}" onchange="saveItem(${product.id}, '${product.name}')">
+            <label for="item${product.id}">${product.name}</label>
+            <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)">+</button>
+            <input type="number" id="quantity${product.id}" min="1" value="${defaultQuantity}" onchange="saveQuantity(${product.id})">
+            <button class="quantity-btn" onclick="changeQuantity(${product.id}, -1)">-</button>
+        `;
+        productList.appendChild(div);
+
+        // 如果商品已经被选中，应用先前保存的数量
+        if (selectedItems[product.id]) {
+            document.getElementById('item' + product.id).checked = true;
+            document.getElementById('quantity' + product.id).value = selectedItems[product.id];
         }
+    });
+}
+
+        
 
         function saveItem(id, name) {
             const checkbox = document.getElementById('item' + id);
@@ -434,6 +441,20 @@
                 quantities.forEach(quantity => quantity.disabled = true);
             }
         }
+        function increaseQuantity(productId) {
+    const specificProducts = [108, 109, 110]; // 需要增加 50 的产品 ID 列表
+    const product = getProductById(productId); // 假设有这个函数可以根据 ID 获取商品
+
+    if (product) {
+        if (specificProducts.includes(productId)) {
+            product.quantity += 50; // 对特定产品增加 50
+        } else {
+            product.quantity += 1; // 对其他产品正常增加 1
+        }
+        updateProductDisplay(product); // 更新显示
+    }
+}
+
 
         function showCategory() {
             let selectedCategory = document.querySelector('input[name="category"]:checked');
@@ -613,8 +634,9 @@ window.onload = function () {
         document.body.classList.add('dark-mode');
         document.querySelector('.toggle-mode-btn').textContent = langCode === 'zh' ? '切换至正常模式' : 'Switch to Light Mode';
     }
-    toggleItems(); // 初始化商品选择框
+    toggleItems();
 }
+
 
 
         // 其他代码省略...
