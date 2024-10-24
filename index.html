@@ -548,12 +548,14 @@ function selectProduct(product) {
     const productList = document.getElementById('productList');
     productList.innerHTML = ''; // 清空之前选择的商品
 
-    // 创建新的商品选择框
+    // 创建新的商品选择框，包含数量调整按钮
     const div = document.createElement('div');
     div.innerHTML = `
         <input type="checkbox" id="item${product.id}" checked onchange="saveItem(${product.id}, '${product.name}')">
         <label for="item${product.id}">${product.name}</label>
+        <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)">+</button>
         <input type="number" id="quantity${product.id}" min="1" value="1" onchange="saveQuantity(${product.id})">
+        <button class="quantity-btn" onclick="changeQuantity(${product.id}, -1)">-</button>
     `;
     productList.appendChild(div);
     
