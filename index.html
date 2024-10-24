@@ -14,19 +14,19 @@
             transition: background-color 0.3s, color 0.3s; /* 添加过渡效果 */
         }
 
-
         /* 黑暗模式 */
         body.dark-mode {
             background-color: #1c1c1c; /* 深灰色背景 */
             color: #e0e0e0; /* 浅色字体 */
         }
-	/* 添加一个容器类来包含目录的label */
-.category-container {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 每行3列，每列平分宽度 */
-    gap: 10px; /* 项目之间的间距 */
-    margin-bottom: 20px;
-}
+
+        /* 添加一个容器类来包含目录的label */
+        .category-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* 每行3列，每列平分宽度 */
+            gap: 10px; /* 项目之间的间距 */
+            margin-bottom: 20px;
+        }
 
         body.dark-mode #result {
             background-color: #333; /* 黑暗模式下的结果框颜色 */
@@ -42,47 +42,47 @@
             background-color: #075e54; /* 深色WhatsApp绿色 */
             color: #e0e0e0; /* 按钮字体颜色 */
         }
-/* 为每个商品项设置 flexbox 布局 */
-#productList div {
-    display: flex;
-    justify-content: space-between; /* 商品名称和输入框分布两侧 */
-    align-items: center; /* 垂直居中对齐 */
-    margin-bottom: 15px; /* 保持每个商品项之间的间距 */
-}
 
-/* 商品名称部分自适应占据左边空间 */
-#productList label {
-    flex-grow: 1; /* 自动扩展，占据可用空间 */
-    margin-right: 10px; /* 给输入框预留间距 */
-}
+        /* 为每个商品项设置 flexbox 布局 */
+        #productList div {
+            display: flex;
+            justify-content: space-between; /* 商品名称和输入框分布两侧 */
+            align-items: center; /* 垂直居中对齐 */
+            margin-bottom: 15px; /* 保持每个商品项之间的间距 */
+        }
 
-#suggestions {
-    border: 1px solid #ccc;
-    max-height: 150px;
-    overflow-y: auto;
-    background-color: white;
-    position: absolute;
-    width: 170px;
-    z-index: 10;
-}
+        /* 商品名称部分自适应占据左边空间 */
+        #productList label {
+            flex-grow: 1; /* 自动扩展，占据可用空间 */
+            margin-right: 10px; /* 给输入框预留间距 */
+        }
 
-#suggestions div {
-    padding: 8px;
-    cursor: pointer;
-    color: #333; /* 设置字体颜色为深灰色 */
-}
+        #suggestions {
+            border: 1px solid #ccc;
+            max-height: 150px;
+            overflow-y: auto;
+            background-color: white;
+            position: absolute;
+            width: 170px;
+            z-index: 10;
+        }
 
-#suggestions div:hover {
-    background-color: #f0f0f0;
-}
+        #suggestions div {
+            padding: 8px;
+            cursor: pointer;
+            color: #333; /* 设置字体颜色为深灰色 */
+        }
 
+        #suggestions div:hover {
+            background-color: #f0f0f0;
+        }
 
-/* 调整输入框大小并对齐右边 */
-input[type="number"] {
-    width: 80px;
-    margin-left: 10px;
-    text-align: right; /* 使数字靠右显示 */
-}
+        /* 调整输入框大小并对齐右边 */
+        input[type="number"] {
+            width: 80px;
+            margin-left: 10px;
+            text-align: right; /* 使数字靠右显示 */
+        }
 
         h1 {
             font-size: 2.5rem;
@@ -132,11 +132,6 @@ input[type="number"] {
             color: white; /* 白色文字 */
         }
 
-        input[type="number"] {
-            width: 50px;
-            margin-left: 10px;
-        }
-
         /* 切换模式按钮样式 */
         .toggle-mode-btn {
             background-color: #007bff;
@@ -148,18 +143,18 @@ input[type="number"] {
             border-radius: 5px;
             font-size: 1rem;
         }
-        .contact-info {
-    font-size: 1rem;
-    font-style: italic;
-    color: #555; /* 稍微浅一点的颜色 */
-    text-align: center;
-    background-color: #f9f9f9; /* 柔和的背景色 */
-    padding: 10px;
-    border-radius: 8px;
-    margin-bottom: 20px; /* 增加与下方内容的间距 */
-    border: 1px solid #ddd; /* 添加浅色边框 */
-}
 
+        .contact-info {
+            font-size: 1rem;
+            font-style: italic;
+            color: #555; /* 稍微浅一点的颜色 */
+            text-align: center;
+            background-color: #f9f9f9; /* 柔和的背景色 */
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px; /* 增加与下方内容的间距 */
+            border: 1px solid #ddd; /* 添加浅色边框 */
+        }
 
         @media (max-width: 768px) {
             h1 {
@@ -173,6 +168,28 @@ input[type="number"] {
             button {
                 padding: 10px 15px;
             }
+        }
+
+        .quantity-btn {
+            width: 30px;
+            height: 30px;
+            border: none;
+            border-radius: 50%; /* 圆形按钮 */
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .quantity-btn:nth-child(3) {
+            background-color: #00BFFF; /* 青色 */
+            color: white;
+        }
+
+        .quantity-btn:nth-child(5) {
+            background-color: #FF4500; /* 红色 */
+            color: white;
         }
     </style>
 </head>
@@ -191,19 +208,18 @@ input[type="number"] {
 
     <h3>选择目录</h3>
 
-<div class="category-container">
-    <label><input type="radio" name="category" value="BanHeang" onclick="showCategory()">BanHeang</label>
-    <label><input type="radio" name="category" value="HopHup" onclick="showCategory()">HopHup</label>
-    <label><input type="radio" name="category" value="Chocolate" onclick="showCategory()">Chocolate</label>
-    <label><input type="radio" name="category" value="Sotong" onclick="showCategory()">Sotong</label>
-    <label><input type="radio" name="category" value="Coffee" onclick="showCategory()">Coffee</label>
-    <label><input type="radio" name="category" value="Amplang" onclick="showCategory()">Amplang</label>
-    <label><input type="radio" name="category" value="Other" onclick="showCategory()">Other</label>
-    
-</div>
+    <div class="category-container">
+        <label><input type="radio" name="category" value="BanHeang" onclick="showCategory()">BanHeang</label>
+        <label><input type="radio" name="category" value="HopHup" onclick="showCategory()">HopHup</label>
+        <label><input type="radio" name="category" value="Chocolate" onclick="showCategory()">Chocolate</label>
+        <label><input type="radio" name="category" value="Sotong" onclick="showCategory()">Sotong</label>
+        <label><input type="radio" name="category" value="Coffee" onclick="showCategory()">Coffee</label>
+        <label><input type="radio" name="category" value="Amplang" onclick="showCategory()">Amplang</label>
+        <label><input type="radio" name="category" value="Other" onclick="showCategory()">Other</label>
+    </div>
 
-<input type="text" id="productSearch" placeholder="搜索商品..." oninput="searchProduct()" autocomplete="off">
-<div id="suggestions"></div>
+    <input type="text" id="productSearch" placeholder="搜索商品..." oninput="searchProduct()" autocomplete="off">
+    <div id="suggestions"></div>
     <h3>选择商品（没输入数量默认是1）</h3>
     <div id="productList"></div>
 
@@ -301,7 +317,9 @@ input[type="number"] {
                 { id: 115, name: "AD Chocolate Tiramisu", unit: 'pc'},
                 { id: 116, name: "AD Chocolate Mint", unit: 'pc'},
                 { id: 117, name: "AD Chocolate Rambutan", unit: 'pc'},
-                { id: 118, name: "AD Chocolate Soursup", unit: 'pc'}
+                { id: 118, name: "AD Chocolate Soursup", unit: 'pc'},
+                { id: 127, name: "AD Chocolate Coconut", unit: 'pc'},
+                { id: 128, name: "AD Chocolate Mangosteen", unit: 'pc'}
             ],
             Sotong: [
                 { id: 85, name: "Cuttlefish Red" },
@@ -351,7 +369,6 @@ input[type="number"] {
             ]
         };
 
-
         let selectedItems = {};
 
         function loadProducts(products) {
@@ -363,7 +380,9 @@ input[type="number"] {
                 div.innerHTML = `
                     <input type="checkbox" id="item${product.id}" onchange="saveItem(${product.id}, '${product.name}')">
                     <label for="item${product.id}">${product.name}</label>
-                    <input type="number" id="quantity${product.id}" min="1" placeholder="数量" onchange="saveQuantity(${product.id})">
+                    <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)">+</button>
+                    <input type="number" id="quantity${product.id}" min="1" value="1" onchange="saveQuantity(${product.id})">
+                    <button class="quantity-btn" onclick="changeQuantity(${product.id}, -1)">-</button>
                 `;
                 productList.appendChild(div);
 
@@ -392,7 +411,17 @@ input[type="number"] {
             }
         }
 
-        function toggleItems() {
+        function changeQuantity(id, change) {
+            const quantityInput = document.getElementById('quantity' + id);
+            let currentQuantity = parseInt(quantityInput.value) || 1; // 默认值为1
+
+            // 更新数量并确保不小于1
+            currentQuantity = Math.max(1, currentQuantity + change);
+            quantityInput.value = currentQuantity;
+
+            saveQuantity(id); // 保存更新的数量
+        }
+                function toggleItems() {
             let selectedStore = document.querySelector('input[name="store"]:checked');
             let checkboxes = document.querySelectorAll('#productList input[type="checkbox"]');
             let quantities = document.querySelectorAll('#productList input[type="number"]');
@@ -438,16 +467,20 @@ function generateText() {
     for (const [id, quantity] of Object.entries(selectedItems)) {
         const product = Object.values(categories).flat().find(p => p.id == id);
         if (product) {
-            // 根据商品的 unit 属性决定是显示 "pc" 还是 "ctn"
-            const unit = product.unit === 'pc' ? 'pc' : '📦';
+            const unit = product.unit === 'pc' ? 'pc' : 'ctn';
             result += product.name + ' - ' + quantity + ' ' + unit + '\n';
         }
     }
 
     result += '\nAirport Stock Order: smartprofits.github.io/order/';
     document.getElementById('result').innerText = result;
+
+    // 清空商品列表
+    document.getElementById('productList').innerHTML = '';
+
     return result;
 }
+
 
 
         function copyAndSendWhatsApp() {
@@ -581,8 +614,10 @@ window.onload = function () {
     toggleItems(); // 初始化商品选择框
 }
 
+
+        // 其他代码省略...
     </script>
-<p class="contact-info">If you have any questions or need to add new products, please contact me (Mark).</p>
-    
+
+    <p class="contact-info">If you have any questions or need to add new products, please contact me (Mark).</p>
 </body>
 </html>
