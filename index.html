@@ -307,6 +307,10 @@
     <span style="--i:4;"></span>
   </div>
 </div>
+<div>
+    <input type="checkbox" id="addOnCheckbox" />
+    <label for="addOnCheckbox">Add On</label>
+</div>
 
 		<h3>选择店铺</h3>
 		<div>
@@ -336,10 +340,6 @@
 		<button class="whatsapp-button" onclick="copyAndSendWhatsApp()">复制并发送至WhatsApp</button>
 
 		<div id="result"></div>
-        <h3>修改订单</h3>
-<textarea id="orderText" rows="10" style="width: 100%;" placeholder="请粘贴生成的订单文本..."></textarea>
-<button onclick="modifyOrder()">加载订单以进行修改</button>
-
 
 		<script>
 			        // 分类商品
@@ -576,31 +576,37 @@
 			        }
 
 			function generateText() {
-			    let result = '';
-			    let selectedStore = document.querySelector('input[name="store"]:checked');
-			    if (selectedStore) {
-			        result += 'Kedai: ' + selectedStore.value + '\n\n';
-			    } else {
-			        result += 'Kedai: 未选择\n';
-			    }
+    let result = '';
+    let selectedStore = document.querySelector('input[name="store"]:checked');
+    let hasAddOn = document.getElementById('addOnCheckbox').checked;
 
-			    // 遍历所有已选择的产品
-			    for (const [id, quantity] of Object.entries(selectedItems)) {
-			        const product = Object.values(categories).flat().find(p => p.id == id);
-			        if (product) {
-			            const unit = product.unit === 'pc' ? 'pc' : 'ctn';
-			            result += product.name + ' - ' + quantity + ' ' + unit + '\n';
-			        }
-			    }
+    if (selectedStore) {
+        result += 'Kedai: ' + selectedStore.value;
+        if (hasAddOn) {
+            result += ' 💥Add On💥';
+        }
+        result += '\n\n';
+    } else {
+        result += 'Kedai: 未选择\n';
+    }
 
-			    result += '\nAirport Stock Order: smartprofits.github.io/order/';
-			    document.getElementById('result').innerText = result;
+    // 遍历所有已选择的产品
+    for (const [id, quantity] of Object.entries(selectedItems)) {
+        const product = Object.values(categories).flat().find(p => p.id == id);
+        if (product) {
+            const unit = product.unit === 'pc' ? 'pc' : 'ctn';
+            result += product.name + ' - ' + quantity + ' ' + unit + '\n';
+        }
+    }
 
-			    // 清空商品列表
-			    document.getElementById('productList').innerHTML = '';
+    result += '\nAirport Stock Order: smartprofits.github.io/order/';
+    document.getElementById('result').innerText = result;
 
-			    return result;
-			}
+    // 清空商品列表
+    document.getElementById('productList').innerHTML = '';
+
+    return result;
+}
 
 
 
@@ -658,60 +664,6 @@
 			        suggestionsContainer.appendChild(div);
 			    });
 			}
-            function modifyOrder() {
-    const orderText = document.getElementById('orderText').value;
-    if (!orderText) {
-        alert('请粘贴生成的订单文本！');
-        return;
-    }
-
-    const lines = orderText.split('\n');
-    let store = '';
-    let items = [];
-
-    lines.forEach(line => {
-        if (line.startsWith('Kedai:')) {
-            store = line.replace('Kedai: ', '').trim();
-        } else if (line && line.includes('-')) {
-            const parts = line.split('-');
-            const productName = parts[0].trim();
-            const quantityInfo = parts[1].trim();
-            const quantity = parseInt(quantityInfo.split(' ')[0], 10);
-
-            // 查找商品ID
-            const product = Object.values(categories).flat().find(p => p.name === productName);
-            if (product) {
-                items.push({ id: product.id, quantity });
-            }
-        }
-    });
-
-    // 设置商店选项
-    if (store) {
-        const storeRadio = document.querySelector(`input[name="store"][value="${store}"]`);
-        if (storeRadio) {
-            storeRadio.checked = true;
-            toggleItems();
-        }
-    }
-
-    // 清空之前的商品列表并加载新商品
-    selectedItems = {}; // 清空之前的选择
-    loadProducts(Object.values(categories).flat()); // 加载所有商品
-
-    // 设置选中的商品和数量
-    items.forEach(item => {
-        const checkbox = document.getElementById('item' + item.id);
-        const quantityInput = document.getElementById('quantity' + item.id);
-
-        if (checkbox && quantityInput) {
-            checkbox.checked = true;
-            quantityInput.value = item.quantity;
-            selectedItems[item.id] = item.quantity;
-        }
-    });
-}
-
 
 			function selectProduct(product) {
 			    const productSearch = document.getElementById('productSearch');
