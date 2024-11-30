@@ -5,6 +5,69 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Airport Stock Request</title>
 		<style>
+       
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.loader {
+    position: relative;
+    display: flex;
+}
+
+.loader span {
+    position: relative;
+    width: 50px;
+    height: 50px;
+    background: #eaeef0;
+    margin: 0 5px;
+    border: 5px solid #eaeef0;
+    border-radius: 50%;
+    box-shadow: -8px -8px 15px rgba(255, 255, 255, 1),
+                8px 8px 15px rgba(0, 0, 0, 0.2),
+                inset 3px 3px 5px rgba(0, 0, 0, 0.1),
+                inset -1px -1px 5px rgba(255, 255, 255, 1);
+}
+
+.loader span::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #5c89ff;
+    border-radius: 50%;
+    box-shadow: inset 3px 3px 5px rgba(0, 0, 0, 0.1),
+                inset -1px -1px 5px rgba(255, 255, 255, 1);
+    transform: scale(0);
+    animation: animateDots 3.5s linear infinite, animateColor 5s linear infinite;
+    animation-delay: calc(var(--i) * 0.2s);
+}
+
+@keyframes animateDots {
+    0%, 9.99%, 70.001%
+    {
+        transform: scale(0);
+    }
+    10%, 70%
+    {
+        transform: scale(1);
+    }
+}
+
+@keyframes animateColor {
+    0% {
+        filter: hue-rotate(0deg);
+    }
+    100% {
+        filter: hue-rotate(360deg);
+    }
+}
 						        body {
 						            font-family: Arial, sans-serif;
 						            padding: 15px;
@@ -99,10 +162,10 @@
 						}
 
 						        h1 {
-						            font-size: 2.5rem;
+						            font-size: 4rem;
 						            font-weight: bold;
 						            text-align: center;
-						            margin-bottom: 110px;
+						         
 						        }
 
 						        #result {
@@ -190,7 +253,7 @@
 						            border: none;
 						            border-radius: 50%; /* 圆形按钮 */
 						            cursor: pointer;
-						            font-size: 1.2rem;
+						            font-size: 2rem;
 						            display: inline-flex;
 						            justify-content: center;
 						            align-items: center;
@@ -224,8 +287,9 @@
 			                    input[type="number"] {
 			    width: 40px; /* 你可以根据需要调整为任何合适的大小 */
 			    padding: 5px; /* 调整内边距以使输入框看起来更舒适 */
-			    margin-left: 10px; /* 留出与其他元素的间距 */
-			    text-align: right; /* 保持数字靠右对齐 */
+			    margin-left: 10px;
+                margin-right: 10px;/* 留出与其他元素的间距 */
+			    text-align: middle; /* 保持数字靠右对齐 */
 			   }
 		</style>
 	</head>
@@ -234,6 +298,15 @@
 		<button class="toggle-mode-btn" onclick="toggleDarkMode()">切换至黑暗模式</button>
 
 		<h1>Stock Order</h1>
+        <div class="container">
+  <div class="loader">
+    <span style="--i:0;"></span>
+    <span style="--i:1;"></span>
+    <span style="--i:2;"></span>
+    <span style="--i:3;"></span>
+    <span style="--i:4;"></span>
+  </div>
+</div>
 
 		<h3>选择店铺</h3>
 		<div>
@@ -263,6 +336,10 @@
 		<button class="whatsapp-button" onclick="copyAndSendWhatsApp()">复制并发送至WhatsApp</button>
 
 		<div id="result"></div>
+        <h3>修改订单</h3>
+<textarea id="orderText" rows="10" style="width: 100%;" placeholder="请粘贴生成的订单文本..."></textarea>
+<button onclick="modifyOrder()">加载订单以进行修改</button>
+
 
 		<script>
 			        // 分类商品
@@ -296,8 +373,9 @@
 			                { id: 30, name: "Shat Kek Ma" },
 			                { id: 31, name: "Shat Kek Ma (Brown Sugar)" },
 			                { id: 32, name: "Coconut Biscuits" },
-			                { id: 33, name: "BH Freeze Dried Durian" },
-			                { id: 34, name: "BH Freeze Dried Mango" },
+			                { id: 33, name: "BH FD Durian 50g" },
+			                { id: 34, name: "BH FD Mango 50g" },
+                            { id: 129, name: "BH FD Durian 30g🆕" },
 			                { id: 36, name: "Butter Cookies" },
 			                { id: 37, name: "Chocolate Cookies" },
 			                { id: 38, name: "Raisin Cookies" },
@@ -580,6 +658,60 @@
 			        suggestionsContainer.appendChild(div);
 			    });
 			}
+            function modifyOrder() {
+    const orderText = document.getElementById('orderText').value;
+    if (!orderText) {
+        alert('请粘贴生成的订单文本！');
+        return;
+    }
+
+    const lines = orderText.split('\n');
+    let store = '';
+    let items = [];
+
+    lines.forEach(line => {
+        if (line.startsWith('Kedai:')) {
+            store = line.replace('Kedai: ', '').trim();
+        } else if (line && line.includes('-')) {
+            const parts = line.split('-');
+            const productName = parts[0].trim();
+            const quantityInfo = parts[1].trim();
+            const quantity = parseInt(quantityInfo.split(' ')[0], 10);
+
+            // 查找商品ID
+            const product = Object.values(categories).flat().find(p => p.name === productName);
+            if (product) {
+                items.push({ id: product.id, quantity });
+            }
+        }
+    });
+
+    // 设置商店选项
+    if (store) {
+        const storeRadio = document.querySelector(`input[name="store"][value="${store}"]`);
+        if (storeRadio) {
+            storeRadio.checked = true;
+            toggleItems();
+        }
+    }
+
+    // 清空之前的商品列表并加载新商品
+    selectedItems = {}; // 清空之前的选择
+    loadProducts(Object.values(categories).flat()); // 加载所有商品
+
+    // 设置选中的商品和数量
+    items.forEach(item => {
+        const checkbox = document.getElementById('item' + item.id);
+        const quantityInput = document.getElementById('quantity' + item.id);
+
+        if (checkbox && quantityInput) {
+            checkbox.checked = true;
+            quantityInput.value = item.quantity;
+            selectedItems[item.id] = item.quantity;
+        }
+    });
+}
+
 
 			function selectProduct(product) {
 			    const productSearch = document.getElementById('productSearch');
