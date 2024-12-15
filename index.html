@@ -547,11 +547,7 @@ function loadProducts(products) {
         
         div.innerHTML = `
             <input type="checkbox" id="item${product.id}" ${isChecked} onchange="saveItem(${product.id}, '${product.name}')">
-            <label for="item${product.id}">
-                ${product.name}
-                <br> <!-- 添加换行 -->
-                <span class="stock-info" style="font-size: 0.8em; color: #666;">Stock: 0</span>
-            </label>
+            <label for="item${product.id}">${product.name}</label>
             <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)">+</button>
             <input type="number" 
                    id="quantity${product.id}" 
