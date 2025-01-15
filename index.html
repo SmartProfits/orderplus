@@ -416,6 +416,71 @@
     .delete-button:hover {
       background-color: #c82333;
     }
+
+    /* 添加到现有的 CSS 中 */
+    .card-actions {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px;
+      margin-top: 10px;
+      border-top: 1px solid #eee;
+    }
+
+    .card-actions button {
+      flex: 1;
+      margin: 0 8px;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    .action-separator {
+      width: 1px;
+      background-color: #eee;
+    }
+
+    .edit-button {
+      background-color: #007bff;
+      color: white;
+    }
+
+    .delete-button {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    .toast-message {
+      position: fixed;
+      bottom: 20%;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 25px;
+      font-size: 14px;
+      z-index: 1000;
+      animation: fadeInOut 2s ease-in-out;
+    }
+
+    @keyframes fadeInOut {
+      0% { opacity: 0; }
+      20% { opacity: 1; }
+      80% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+
+    /* 移动端特定样式 */
+    @media (max-width: 600px) {
+      .card-actions button {
+        padding: 15px;  /* 增加按钮大小 */
+        min-height: 48px; /* 确保足够的触摸区域 */
+      }
+      
+      .card-actions {
+        padding: 15px 10px; /* 增加内边距 */
+      }
+    }
   </style>
 </head>
 <body>
@@ -1676,12 +1741,64 @@
           <button class="edit-button" data-item-id="${item.id}">
             <i class="fas fa-edit"></i> Edit
           </button>
+          <span class="action-separator"></span>
           <button class="delete-button" data-item-id="${item.id}" data-item-name="${item.name}">
             <i class="fas fa-trash"></i> Delete
           </button>
         </div>
       `;
+      
+      // 添加长按确认删除
+      const deleteBtn = card.querySelector('.delete-button');
+      let pressTimer;
+      
+      deleteBtn.addEventListener('touchstart', (e) => {
+        pressTimer = setTimeout(() => {
+          handleDelete(item.id, item.name);
+        }, 800); // 800ms 长按
+      });
+      
+      deleteBtn.addEventListener('touchend', () => {
+        clearTimeout(pressTimer);
+      });
+      
+      deleteBtn.addEventListener('touchmove', () => {
+        clearTimeout(pressTimer);
+      });
+      
+      // 防止快速点击触发删除
+      deleteBtn.addEventListener('click', (e) => {
+        if (e.pointerType === 'touch') {
+          e.preventDefault();
+          // 显示提示
+          showToast('Long press to delete');
+        } else {
+          // 桌面端保持原有点击删除功能
+          handleDelete(item.id, item.name);
+        }
+      });
+      
       return card;
+    }
+
+    // 添加 Toast 提示功能
+    function showToast(message) {
+      const toast = document.createElement('div');
+      toast.classList.add('toast-message');
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.remove();
+      }, 2000);
+    }
+
+    // 添加删除处理函数
+    function handleDelete(itemId, itemName) {
+      if (confirm(`Are you sure you want to delete "${itemName}"? This action cannot be undone.`)) {
+        // 原有的删除逻辑
+        // ...
+      }
     }
 
     // Open Edit Modal
