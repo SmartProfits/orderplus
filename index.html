@@ -3,7 +3,7 @@
 <head>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Airport Stock Request</title>
     <style>
         #productList label span {
@@ -1284,42 +1284,77 @@
         // 添加触摸相关变量和函数
         let lastTap = 0;
         let touchTimeout;
+        let touchStartX = 0;
+        let touchStartY = 0;
 
         function handleTouchStart(event) {
-            // 不再阻止默认行为，这样不会影响其他交互
+            const touch = event.touches[0];
+            touchStartX = touch.clientX;
+            touchStartY = touch.clientY;
             lastTap = new Date().getTime();
         }
 
         function handleTouchEnd(event) {
+            // 检查是否在输入框、按钮等交互元素上
+            if (event.target.tagName === 'INPUT' || 
+                event.target.tagName === 'BUTTON' || 
+                event.target.tagName === 'SELECT' ||
+                event.target.tagName === 'A') {
+                return;
+            }
+
+            const touch = event.changedTouches[0];
+            const touchEndX = touch.clientX;
+            const touchEndY = touch.clientY;
+            
+            // 检查触摸移动距离，如果移动太多就不触发
+            const moveDistance = Math.sqrt(
+                Math.pow(touchEndX - touchStartX, 2) + 
+                Math.pow(touchEndY - touchStartY, 2)
+            );
+            
             const currentTime = new Date().getTime();
             const tapLength = currentTime - lastTap;
             
             clearTimeout(touchTimeout);
             
-            if (tapLength < 500 && tapLength > 0) {
-                // 双触发生
-                togglePreview();
-                // 阻止其他事件
+            // 如果移动距离小于10px且时间间隔合适，则触发切换
+            if (moveDistance < 10 && tapLength < 300 && tapLength > 0) {
                 event.preventDefault();
+                togglePreview();
             } else {
                 touchTimeout = setTimeout(() => {
                     // 单触超时，不执行任何操作
-                }, 500);
+                }, 300);
             }
             
             lastTap = currentTime;
         }
 
-        // 修改 togglePreview 函数，添加检查是否有选中商品的逻辑
+        // 修改 togglePreview 函数，添加位置自适应
         function togglePreview() {
             const previewWindow = document.getElementById('preview-window');
             
             // 如果要显示预览窗口，先检查是否有选中的商品
             if (previewWindow.style.display === 'none') {
-                // 如果没有选中商品，不显示预览窗口
                 if (Object.keys(selectedItems).length === 0) {
                     return;
                 }
+                
+                // 调整预览窗口位置，适应手机屏幕
+                if (window.innerWidth <= 768) {
+                    previewWindow.style.width = '90%';
+                    previewWindow.style.right = '5%';
+                    previewWindow.style.left = '5%';
+                    previewWindow.style.maxWidth = 'none';
+                } else {
+                    // 恢复桌面版样式
+                    previewWindow.style.width = 'auto';
+                    previewWindow.style.right = '20px';
+                    previewWindow.style.left = 'auto';
+                    previewWindow.style.maxWidth = '300px';
+                }
+                
                 previewWindow.style.display = 'block';
                 previewWindow.style.opacity = '0';
                 setTimeout(() => {
@@ -1334,6 +1369,24 @@
                 }, 300);
             }
         }
+
+        // 添加窗口大小变化监听
+        window.addEventListener('resize', function() {
+            const previewWindow = document.getElementById('preview-window');
+            if (previewWindow.style.display !== 'none') {
+                if (window.innerWidth <= 768) {
+                    previewWindow.style.width = '90%';
+                    previewWindow.style.right = '5%';
+                    previewWindow.style.left = '5%';
+                    previewWindow.style.maxWidth = 'none';
+                } else {
+                    previewWindow.style.width = 'auto';
+                    previewWindow.style.right = '20px';
+                    previewWindow.style.left = 'auto';
+                    previewWindow.style.maxWidth = '300px';
+                }
+            }
+        });
     </script>
 
     <p class="contact-info">🌟If you have any questions or suggestion please contact me (Mark).<br>🌟Rowan now will help me to update stock amount.</p>
