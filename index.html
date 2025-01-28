@@ -626,6 +626,12 @@
             <span style="cursor: pointer;" onclick="togglePreview()">×</span>
         </div>
         <div id="preview-content"></div>
+        <!-- 添加分隔线和WhatsApp按钮 -->
+        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.2);">
+            <button class="whatsapp-button" onclick="copyAndSendWhatsApp()" style="width: 100%;">
+                Copy And Paste to WhatsApp
+            </button>
+        </div>
     </div>
 
     <!-- 添加悬浮图标 -->
@@ -754,11 +760,6 @@
     <div id="suggestions"></div>
     <h3>Select items (default quantity is 1）</h3>
     <div id="productList"></div>
-
-    <button onclick="generateText()">Generate</button>
-    <button class="whatsapp-button" onclick="copyAndSendWhatsApp()">Copy And Paste to WhatsApp</button>
-
-    <div id="result"></div>
 
     <script>
         const SHEET_ID = '你的表格ID';
@@ -1075,11 +1076,9 @@
 
             // 将选中的商品按分类整理
             for (const [id, quantity] of Object.entries(selectedItems)) {
-                // 查找商品所属的分类和单位
                 for (const [category, products] of Object.entries(categories)) {
                     const product = products.find(p => p.id == id);
                     if (product) {
-                        // 使用商品定义中的单位，如果没有定义则默认使用 "ctn"
                         const unit = product.unit || 'ctn';
                         categorizedItems[category].push({
                             name: product.name,
@@ -1102,8 +1101,6 @@
             }
 
             result += '\nAirport Stock Order: smartprofits.github.io/order/';
-            document.getElementById('result').innerText = result;
-
             return result;
         }
 
@@ -1218,21 +1215,6 @@
             document.body.classList.add('dark-mode');
             document.querySelector('.toggle-mode-btn').textContent = 'Light Mode🌞';
             localStorage.setItem('dark-mode', 'enabled');
-            
-            // 为预览窗口添加双击事件
-            document.getElementById('preview-window').addEventListener('dblclick', function(e) {
-                e.stopPropagation(); // 阻止事件冒泡
-                togglePreview();
-            });
-            
-            // 为整个文档添加双击事件
-            document.addEventListener('dblclick', function() {
-                const previewWindow = document.getElementById('preview-window');
-                // 只在预览窗口隐藏时显示
-                if (previewWindow.style.display === 'none') {
-                    previewWindow.style.display = 'block';
-                }
-            });
             
             toggleItems(); // 初始化商品选择框
             
