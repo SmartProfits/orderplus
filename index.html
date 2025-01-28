@@ -628,6 +628,29 @@
         <div id="preview-content"></div>
     </div>
 
+    <!-- 添加悬浮图标 -->
+    <div id="preview-icon" style="
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+        border-radius: 25px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        cursor: pointer;
+        display: none;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;"
+        onclick="togglePreview()">
+        📋
+    </div>
+
     <!-- 模式切换按钮 -->
     <button class="toggle-mode-btn" onclick="toggleDarkMode()">Light Mode🌞</button>
 
@@ -1196,8 +1219,6 @@
             document.querySelector('.toggle-mode-btn').textContent = 'Light Mode🌞';
             localStorage.setItem('dark-mode', 'enabled');
             
-            toggleItems(); // 初始化商品选择框
-
             // 为预览窗口添加双击事件
             document.getElementById('preview-window').addEventListener('dblclick', function(e) {
                 e.stopPropagation(); // 阻止事件冒泡
@@ -1207,10 +1228,13 @@
             // 为整个文档添加双击事件
             document.addEventListener('dblclick', function() {
                 const previewWindow = document.getElementById('preview-window');
-                if (Object.keys(selectedItems).length > 0) { // 只在有选中商品时显示
+                // 只在预览窗口隐藏时显示
+                if (previewWindow.style.display === 'none') {
                     previewWindow.style.display = 'block';
                 }
             });
+            
+            toggleItems(); // 初始化商品选择框
             
             // 添加定时刷新
             setInterval(loadQuantitiesFromSheet, 30000);
@@ -1275,19 +1299,27 @@
             });
         }
 
+        // 添加一个标志来控制预览窗口的自动显示
+        let allowAutoShow = true;
+
         // 修改 updatePreview 函数
         function updatePreview() {
             const previewWindow = document.getElementById('preview-window');
+            const previewIcon = document.getElementById('preview-icon');
             const previewContent = document.getElementById('preview-content');
             
-            // 如果没有选择任何商品，隐藏预览窗口
+            // 如果没有选择任何商品，隐藏预览窗口和图标
             if (Object.keys(selectedItems).length === 0) {
                 previewWindow.style.display = 'none';
+                previewIcon.style.display = 'none';
                 return;
             }
             
-            // 显示预览窗口
-            previewWindow.style.display = 'block';
+            // 只在允许自动显示时才显示预览窗口
+            if (allowAutoShow) {
+                previewWindow.style.display = 'block';
+                previewIcon.style.display = 'none';
+            }
             
             // 生成预览内容
             const text = generateText();
@@ -1297,10 +1329,16 @@
         // 修改 togglePreview 函数
         function togglePreview() {
             const previewWindow = document.getElementById('preview-window');
+            const previewIcon = document.getElementById('preview-icon');
+            
             if (previewWindow.style.display === 'none') {
                 previewWindow.style.display = 'block';
+                previewIcon.style.display = 'none';
+                allowAutoShow = true;  // 用户主动显示时，允许自动显示
             } else {
                 previewWindow.style.display = 'none';
+                previewIcon.style.display = 'flex';
+                allowAutoShow = false;  // 用户主动关闭时，禁止自动显示
             }
         }
     </script>
