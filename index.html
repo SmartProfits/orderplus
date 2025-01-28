@@ -623,10 +623,7 @@
         class="glass-effect">
         <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
             <span>订单预览</span>
-            <div>
-                <span style="cursor: pointer; margin-right: 10px; color: #ff6b6b;" onclick="clearAllItems()">🗑️</span>
-                <span style="cursor: pointer;" onclick="togglePreview()">×</span>
-            </div>
+            <span style="cursor: pointer;" onclick="togglePreview()">×</span>
         </div>
         <div id="preview-content"></div>
         <!-- 添加分隔线和WhatsApp按钮 -->
@@ -666,7 +663,7 @@
     <h1>Stock Order</h1>
     <div class="addon-container">
         <label class="addon-switch">
-            <input type="checkbox" id="addOnCheckbox" onchange="updatePreview()">
+            <input type="checkbox" id="addOnCheckbox">
             <span class="addon-slider">
                 <span class="addon-circle"></span>
                 <span class="addon-text">Add On</span>
@@ -969,6 +966,7 @@
             products.forEach(product => {
                 const div = document.createElement('div');
                 const isChecked = selectedItems[product.id] ? 'checked' : '';
+                // 使用商品的默认数量或者已保存的数量，如果都没有则使用1
                 const defaultQuantity = product.defaultQuantity || 1;
                 const currentQuantity = selectedItems[product.id] || defaultQuantity;
 
@@ -1134,35 +1132,81 @@
         function searchProduct() {
             const searchText = document.getElementById('productSearch').value.toLowerCase();
             const suggestionsContainer = document.getElementById('suggestions');
-            suggestionsContainer.innerHTML = '';
+            suggestionsContainer.innerHTML = ''; // 清空之前的建议
 
-            if (searchText.length === 0) return;
+            if (searchText.length === 0) return; // 如果没有输入，不显示建议
 
             // 获取所有分类中的商品
             const allProducts = Object.values(categories).flat();
-            
+
             // 根据输入的内容筛选出匹配的商品
-            const matchingProducts = allProducts.filter(product => 
-                product.name.toLowerCase().includes(searchText)
-            );
+            const matchingProducts = allProducts.filter(product => product.name.toLowerCase().includes(searchText));
 
             // 显示匹配的商品作为建议
             matchingProducts.forEach(product => {
                 const div = document.createElement('div');
                 div.textContent = product.name;
-                div.onclick = () => selectProduct(product);
+                div.onclick = () => selectProduct(product); // 点击建议后选择该商品
                 suggestionsContainer.appendChild(div);
             });
         }
 
         function selectProduct(product) {
-            // 清空搜索框和建议
-            document.getElementById('productSearch').value = '';
+            const productSearch = document.getElementById('productSearch');
+            productSearch.value = '';
+            const productList = document.getElementById('productList');
+            productList.innerHTML = '';
+
+            // 创建新的商品选择框
+            const div = document.createElement('div');
+            div.innerHTML = `
+                <input type="checkbox" id="item${product.id}" checked onchange="saveItem(${product.id}, '${product.name}')">
+                <label for="item${product.id}">${product.name}</label>
+                <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)">+</button>
+                <input type="number" id="quantity${product.id}" min="1" value="1" onchange="saveQuantity(${product.id})">
+                <button class="quantity-btn" onclick="changeQuantity(${product.id}, -1)">-</button>
+            `;
+            productList.appendChild(div);
+
+            // 保存新选择的商品
+            saveItem(product.id, product.name);
+
+            // 立即为这个特定商品加载库存信息
+            loadStockForProduct(product.name);
+
             document.getElementById('suggestions').innerHTML = '';
-            
-            // 选中该商品
-            selectedItems[product.id] = 1;
-            updatePreview();
+        }
+
+        // 新增函数：只为特定商品加载库存信息
+        function loadStockForProduct(productName) {
+            const SHEET_ID = '1QUB8R0-gtwNhdiPYU2rwFf_UKrGyyqCQHzIQ7AxKFLI';
+            const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME}`;
+
+            fetch(url)
+                .then(response => response.text())
+                .then(data => {
+                    try {
+                        const jsonData = JSON.parse(data.substr(47).slice(0, -2));
+                        const rows = jsonData.table.rows;
+
+                        // 查找特定商品的库存
+                        const stockInfo = rows.find(row =>
+                            row.c[0] && row.c[0].v === productName
+                        );
+
+                        if (stockInfo && stockInfo.c[1]) {
+                            const stock = stockInfo.c[1].v;
+                            // 更新特定商品的标签
+                            const label = document.querySelector(`label[for="item${product.id}"]`);
+                            if (label) {
+                                label.innerHTML = `${productName} <span style="color: #666; font-size: 0.9em;">(Stock:${stock})</span>`;
+                            }
+                        }
+                    } catch (error) {
+                        console.error('解析数据错误:', error);
+                    }
+                })
+                .catch(error => console.error('获取数据失败:', error));
         }
 
         // 在页面加载时设置默认语言
@@ -1277,18 +1321,6 @@
                 previewWindow.style.display = 'none';
                 previewIcon.style.display = 'flex';
                 allowAutoShow = false;  // 用户主动关闭时，禁止自动显示
-            }
-        }
-
-        // 添加清空功能
-        function clearAllItems() {
-            if (confirm('确定要清空所有选择的商品吗？')) {
-                selectedItems = {};
-                // 取消所有复选框的选中状态
-                document.querySelectorAll('#productList input[type="checkbox"]').forEach(checkbox => {
-                    checkbox.checked = false;
-                });
-                updatePreview();
             }
         }
     </script>
