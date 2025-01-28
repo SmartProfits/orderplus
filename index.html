@@ -635,9 +635,6 @@
                 Copy And Paste to WhatsApp
             </button>
         </div>
-        <button onclick="saveOrder()" style="width: 100%; margin-top: 10px;">
-            Save Order
-        </button>
     </div>
 
     <!-- 添加悬浮图标 -->
@@ -1293,38 +1290,6 @@
                 });
                 updatePreview();
             }
-        }
-
-        // 添加保存和加载订单的功能
-        function saveOrder() {
-            const orderData = {
-                store: document.querySelector('input[name="store"]:checked')?.value,
-                items: selectedItems,
-                addOn: document.getElementById('addOnCheckbox').checked,
-                date: new Date().toISOString()
-            };
-            
-            let orders = JSON.parse(localStorage.getItem('orders') || '[]');
-            orders.unshift(orderData);
-            // 只保留最近5个订单
-            orders = orders.slice(0, 5);
-            localStorage.setItem('orders', JSON.stringify(orders));
-            alert('订单已保存');
-        }
-
-        function loadOrder(orderData) {
-            // 设置店铺
-            if (orderData.store) {
-                document.querySelector(`input[value="${orderData.store}"]`).checked = true;
-            }
-            
-            // 设置商品
-            selectedItems = orderData.items;
-            
-            // 设置Add On
-            document.getElementById('addOnCheckbox').checked = orderData.addOn;
-            
-            updatePreview();
         }
     </script>
 
