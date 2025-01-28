@@ -663,7 +663,7 @@
     <h1>Stock Order</h1>
     <div class="addon-container">
         <label class="addon-switch">
-            <input type="checkbox" id="addOnCheckbox" onchange="updatePreview()">
+            <input type="checkbox" id="addOnCheckbox">
             <span class="addon-slider">
                 <span class="addon-circle"></span>
                 <span class="addon-text">Add On</span>
@@ -1107,9 +1107,9 @@
         function copyAndSendWhatsApp() {
             let text = generateText();
             navigator.clipboard.writeText(text).then(() => {
-                // 使用实际的 WhatsApp 群组链接
-                const groupLink = 'https://chat.whatsapp.com/FwwLA8M62mPK1N1jZj6BJw';
-                window.open(groupLink, '_blank');
+                alert('文字已复制，现在跳转到WhatsApp');
+                let whatsappURL = `https://wa.me/?text=${encodeURIComponent(text)}`;
+                window.location.href = whatsappURL;
             }).catch(err => {
                 console.error('无法复制', err);
             });
