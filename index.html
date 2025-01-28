@@ -1198,6 +1198,20 @@
             
             toggleItems(); // 初始化商品选择框
 
+            // 为预览窗口添加双击事件
+            document.getElementById('preview-window').addEventListener('dblclick', function(e) {
+                e.stopPropagation(); // 阻止事件冒泡
+                togglePreview();
+            });
+            
+            // 为整个文档添加双击事件
+            document.addEventListener('dblclick', function() {
+                const previewWindow = document.getElementById('preview-window');
+                if (Object.keys(selectedItems).length > 0) { // 只在有选中商品时显示
+                    previewWindow.style.display = 'block';
+                }
+            });
+            
             // 添加定时刷新
             setInterval(loadQuantitiesFromSheet, 30000);
         }
@@ -1261,7 +1275,7 @@
             });
         }
 
-        // 添加预览更新函数
+        // 修改 updatePreview 函数
         function updatePreview() {
             const previewWindow = document.getElementById('preview-window');
             const previewContent = document.getElementById('preview-content');
@@ -1280,10 +1294,14 @@
             previewContent.innerText = text;
         }
 
-        // 添加预览窗口切换函数
+        // 修改 togglePreview 函数
         function togglePreview() {
             const previewWindow = document.getElementById('preview-window');
-            previewWindow.style.display = previewWindow.style.display === 'none' ? 'block' : 'none';
+            if (previewWindow.style.display === 'none') {
+                previewWindow.style.display = 'block';
+            } else {
+                previewWindow.style.display = 'none';
+            }
         }
     </script>
 
