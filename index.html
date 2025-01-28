@@ -608,8 +608,8 @@
         }
     </style>
 </head>
-<body>
-    <!-- 在 body 开始处添加浮动预览窗口 -->
+<body ondblclick="togglePreview()" ontouchstart="handleTouchStart(event)" ontouchend="handleTouchEnd(event)">
+    <!-- 修改预览窗口，移除双击事件（避免事件冒泡导致触发两次） -->
     <div id="preview-window" style="
         position: fixed;
         top: 20px;
@@ -620,7 +620,8 @@
         z-index: 1000;
         padding: 15px;
         display: none;"
-        class="glass-effect">
+        class="glass-effect"
+        onclick="event.stopPropagation()">
         <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
             <span>订单预览</span>
             <span style="cursor: pointer;" onclick="togglePreview()">×</span>
@@ -1280,10 +1281,58 @@
             previewContent.innerText = text;
         }
 
-        // 添加预览窗口切换函数
+        // 添加触摸相关变量和函数
+        let lastTap = 0;
+        let touchTimeout;
+
+        function handleTouchStart(event) {
+            // 不再阻止默认行为，这样不会影响其他交互
+            lastTap = new Date().getTime();
+        }
+
+        function handleTouchEnd(event) {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTap;
+            
+            clearTimeout(touchTimeout);
+            
+            if (tapLength < 500 && tapLength > 0) {
+                // 双触发生
+                togglePreview();
+                // 阻止其他事件
+                event.preventDefault();
+            } else {
+                touchTimeout = setTimeout(() => {
+                    // 单触超时，不执行任何操作
+                }, 500);
+            }
+            
+            lastTap = currentTime;
+        }
+
+        // 修改 togglePreview 函数，添加检查是否有选中商品的逻辑
         function togglePreview() {
             const previewWindow = document.getElementById('preview-window');
-            previewWindow.style.display = previewWindow.style.display === 'none' ? 'block' : 'none';
+            
+            // 如果要显示预览窗口，先检查是否有选中的商品
+            if (previewWindow.style.display === 'none') {
+                // 如果没有选中商品，不显示预览窗口
+                if (Object.keys(selectedItems).length === 0) {
+                    return;
+                }
+                previewWindow.style.display = 'block';
+                previewWindow.style.opacity = '0';
+                setTimeout(() => {
+                    previewWindow.style.transition = 'opacity 0.3s ease';
+                    previewWindow.style.opacity = '1';
+                }, 10);
+            } else {
+                previewWindow.style.transition = 'opacity 0.3s ease';
+                previewWindow.style.opacity = '0';
+                setTimeout(() => {
+                    previewWindow.style.display = 'none';
+                }, 300);
+            }
         }
     </script>
 
