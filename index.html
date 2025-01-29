@@ -765,6 +765,9 @@
         const SHEET_ID = '你的表格ID';
         const SHEET_NAME = 'Sheet1'; // 如果你的表格页面名称不是 Sheet1，请修改这里
 
+        // 添加一个全局变量来存储库存信息
+        let stockMap = {};
+
         function loadQuantitiesFromSheet() {
             const SHEET_ID = '1QUB8R0-gtwNhdiPYU2rwFf_UKrGyyqCQHzIQ7AxKFLI';
             const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME}`;
@@ -776,8 +779,8 @@
                         const jsonData = JSON.parse(data.substr(47).slice(0, -2));
                         const rows = jsonData.table.rows;
 
-                        // 创建一个映射来存储商品名称和库存数量
-                        const stockMap = {};
+                        // 更新全局 stockMap
+                        stockMap = {};
                         rows.forEach(row => {
                             if(row.c[0] && row.c[1]) {
                                 const productName = row.c[0].v;
@@ -786,16 +789,18 @@
                             }
                         });
 
-                        // 更新所有商品标签显示库存数量
+                        // 更新标签显示
                         const labels = document.querySelectorAll('#productList label');
                         labels.forEach(label => {
                             const productName = label.textContent;
                             const stock = stockMap[productName];
                             if (stock !== undefined) {
-                                // 在商品名称后添加库存数量
                                 label.innerHTML = `${productName} <span style="color: red; font-size: 0.9em;">(Stock: ${stock})</span>`;
                             }
                         });
+
+                        // 更新预览窗口
+                        updatePreview();
                     } catch (error) {
                         console.error('解析数据错误:', error);
                     }
@@ -1054,9 +1059,8 @@
             let result = '';
             let selectedStore = document.querySelector('input[name="store"]:checked');
             let hasAddOn = document.getElementById('addOnCheckbox').checked;
-            let totalItems = 0;  // 添加总数计数器
+            let totalItems = 0;
 
-            // 添加店铺信息
             if (selectedStore) {
                 result += 'Kedai: ' + selectedStore.value;
                 if (hasAddOn) {
@@ -1067,45 +1071,46 @@
                 result += 'Kedai: 未选择\n';
             }
 
-            // 按分类整理已选商品
             const categorizedItems = {};
-
-            // 初始化所有分类
             Object.keys(categories).forEach(category => {
                 categorizedItems[category] = [];
             });
 
-            // 将选中的商品按分类整理
             for (const [id, quantity] of Object.entries(selectedItems)) {
                 for (const [category, products] of Object.entries(categories)) {
                     const product = products.find(p => p.id == id);
                     if (product) {
                         const unit = product.unit || 'ctn';
+                        const stock = stockMap[product.name] || 0;
+                        
                         categorizedItems[category].push({
                             name: product.name,
                             quantity: quantity,
-                            unit: unit
+                            unit: unit,
+                            stock: stock
                         });
-                        // 特殊处理巧克力类商品的计数
+
                         if (category === 'Chocolate') {
-                            totalItems += 1;  // 巧克力只计算为1个单位
+                            totalItems += 1;
                         } else {
-                            totalItems += parseInt(quantity);  // 其他商品正常计数
+                            totalItems += parseInt(quantity);
                         }
                         break;
                     }
                 }
             }
 
-            // 添加总数显示
             result += `Total Items: ${totalItems}\n`;
 
-            // 按分类输出商品
             for (const [category, items] of Object.entries(categorizedItems)) {
                 if (items.length > 0) {
                     result += `\n=== ${category} ===\n`;
                     items.forEach(item => {
-                        result += `${item.name} - ${item.quantity} ${item.unit}\n`;
+                        // 如果库存为0，添加 HTML 样式标签使文本变红
+                        const itemName = item.stock === 0 ? 
+                            `<span style="color: #ff4444;">${item.name}</span>` :
+                            item.name;
+                        result += `${itemName} - ${item.quantity} ${item.unit}\n`;
                     });
                 }
             }
@@ -1303,22 +1308,20 @@
             const previewIcon = document.getElementById('preview-icon');
             const previewContent = document.getElementById('preview-content');
             
-            // 如果没有选择任何商品，隐藏预览窗口和图标
             if (Object.keys(selectedItems).length === 0) {
                 previewWindow.style.display = 'none';
                 previewIcon.style.display = 'none';
                 return;
             }
             
-            // 只在允许自动显示时才显示预览窗口
             if (allowAutoShow) {
                 previewWindow.style.display = 'block';
                 previewIcon.style.display = 'none';
             }
             
-            // 生成预览内容
+            // 生成预览内容并设置为 HTML，将换行符转换为 <br>
             const text = generateText();
-            previewContent.innerText = text;
+            previewContent.innerHTML = text.replace(/\n/g, '<br>');
         }
 
         // 修改 togglePreview 函数
