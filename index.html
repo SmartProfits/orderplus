@@ -663,7 +663,7 @@
     <h1>Stock Order</h1>
     <div class="addon-container">
         <label class="addon-switch">
-            <input type="checkbox" id="addOnCheckbox">
+            <input type="checkbox" id="addOnCheckbox" onchange="updatePreview()">
             <span class="addon-slider">
                 <span class="addon-circle"></span>
                 <span class="addon-text">Add On</span>
@@ -1054,6 +1054,7 @@
             let result = '';
             let selectedStore = document.querySelector('input[name="store"]:checked');
             let hasAddOn = document.getElementById('addOnCheckbox').checked;
+            let totalItems = 0;  // 添加总数计数器
 
             // 添加店铺信息
             if (selectedStore) {
@@ -1085,10 +1086,19 @@
                             quantity: quantity,
                             unit: unit
                         });
+                        // 特殊处理巧克力类商品的计数
+                        if (category === 'Chocolate') {
+                            totalItems += 1;  // 巧克力只计算为1个单位
+                        } else {
+                            totalItems += parseInt(quantity);  // 其他商品正常计数
+                        }
                         break;
                     }
                 }
             }
+
+            // 添加总数显示
+            result += `Total Items: ${totalItems}\n`;
 
             // 按分类输出商品
             for (const [category, items] of Object.entries(categorizedItems)) {
@@ -1240,6 +1250,9 @@
             
             // 触发原有的toggleItems函数
             toggleItems();
+            
+            // 更新预览窗口
+            updatePreview();
         }
 
         function selectCategory(element, value) {
@@ -1323,6 +1336,14 @@
                 allowAutoShow = false;  // 用户主动关闭时，禁止自动显示
             }
         }
+
+        // 在 HTML 中为 Add On 复选框添加 onchange 事件
+        document.addEventListener('DOMContentLoaded', function() {
+            const addOnCheckbox = document.getElementById('addOnCheckbox');
+            addOnCheckbox.addEventListener('change', function() {
+                updatePreview();
+            });
+        });
     </script>
 
     <p class="contact-info">🌟If you have any questions or suggestion please contact me (Mark).<br>🌟Rowan now will help me to update stock amount.</p>
