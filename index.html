@@ -7,8 +7,13 @@
     <title>Airport Stock Request</title>
     <style>
         #productList label span {
-            color: #666;  /* 默认模式下的颜色 */
+            color: #00CED1 !important;  /* 默认显示青色 */
             font-size: 0.9em;
+        }
+
+        /* 当库存为0时显示红色 */
+        #productList label span.zero-stock {
+            color: #ff4444 !important;  /* 红色 */
         }
 
         /* 黑暗模式下的 stock 信息颜色 */
@@ -95,6 +100,12 @@
             min-height: 100vh;
         }
 
+        /* Light Mode 的背景和文字颜色 */
+        body:not(.dark-mode) {
+            background: #ffffff;  /* 纯白色背景 */
+            color: #333333;  /* 深灰色文字 */
+        }
+
         /* 修改黑暗模式背景 */
         body.dark-mode {
             background: linear-gradient(135deg, #1a1f35, #2d1b1b);
@@ -109,6 +120,104 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
             box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
             border-radius: 10px;
+        }
+
+        /* Light Mode 下的玻璃态效果和文字颜色 */
+        body:not(.dark-mode) .glass-effect,
+        body:not(.dark-mode) #productList div,
+        body:not(.dark-mode) button,
+        body:not(.dark-mode) #result,
+        body:not(.dark-mode) #productSearch,
+        body:not(.dark-mode) #suggestions,
+        body:not(.dark-mode) .contact-info,
+        body:not(.dark-mode) .shop-card,
+        body:not(.dark-mode) .category-card {
+            background: rgba(255, 255, 255, 0.95);  /* 近乎纯白的背景 */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);  /* 柔和的阴影 */
+            border: 1px solid rgba(0, 0, 0, 0.1);  /* 淡灰色边框 */
+            color: #333333;
+        }
+
+        /* Light Mode 下的按钮样式 */
+        body:not(.dark-mode) button {
+            background: #ffffff;
+            color: #333333;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Light Mode 下的搜索框文字颜色 */
+        body:not(.dark-mode) #productSearch {
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        /* Light Mode 下的建议框文字颜色 */
+        body:not(.dark-mode) #suggestions div {
+            background: #ffffff;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        body:not(.dark-mode) #suggestions div:hover {
+            background: #f5f5f5;
+        }
+
+        /* Light Mode 下的联系信息文字颜色 */
+        body:not(.dark-mode) .contact-info {
+            color: #2c3e50;
+        }
+
+        /* Light Mode 下的数量控制按钮 */
+        body:not(.dark-mode) .quantity-btn {
+            color: #2c3e50;
+        }
+
+        /* Light Mode 下的 Add On 开关文字 */
+        body:not(.dark-mode) .addon-text {
+            color: #2c3e50;
+        }
+
+        /* Light Mode 下的商品名称和价格 */
+        body:not(.dark-mode) #productList label {
+            color: #2c3e50;
+        }
+
+        /* Light Mode 下的 WhatsApp 按钮保持白色文字 */
+        body:not(.dark-mode) .whatsapp-button {
+            background-color: #25D366;
+            color: white !important;
+        }
+
+        /* Light Mode 下的预览窗口 */
+        body:not(.dark-mode) #preview-window {
+            background: rgba(255, 255, 255, 0.8);  /* 半透明白色背景 */
+            backdrop-filter: blur(10px);  /* 磨砂玻璃效果 */
+            -webkit-backdrop-filter: blur(10px);  /* Safari 支持 */
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            color: #333333;
+        }
+
+        /* Light Mode 下的商店和分类卡片文字 */
+        body:not(.dark-mode) .shop-name,
+        body:not(.dark-mode) .category-card label {
+            color: #2c3e50;
+        }
+
+        /* Light Mode 下的按钮悬停效果 */
+        body:not(.dark-mode) button:hover {
+            background: #f5f5f5;  /* 浅灰色背景 */
+            color: #000000;
+        }
+
+        /* Light Mode 下的库存为0的商品颜色 */
+        body:not(.dark-mode) span[style*="color: #ff4444"] {
+            color: #e74c3c !important;
+        }
+
+        /* Light Mode 下的库存信息颜色 */
+        body:not(.dark-mode) #productList label span {
+            color: #34495e;
         }
 
         /* 修改商品列表项样式 */
@@ -140,9 +249,9 @@
             transition: all 0.3s ease;
         }
 
-        button:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
+        /* Light Mode 下的按钮悬停效果 */
+        body:not(.dark-mode) button:hover {
+            background: rgba(255, 255, 255, 0.4);
         }
 
         /* 修改结果框样式 */
@@ -168,8 +277,9 @@
             padding: 10px;
         }
 
-        #productSearch::placeholder {
-            color: rgba(255, 255, 255, 0.7);
+        /* Light Mode 下的搜索框占位符颜色 */
+        body:not(.dark-mode) #productSearch::placeholder {
+            color: rgba(44, 62, 80, 0.7);  /* 半透明的深蓝灰色 */
         }
 
         /* 修改建议框样式 */
@@ -496,115 +606,107 @@
             animation: ripple 0.6s linear;
         }
 
-        .addon-container {
-            margin: 30px auto;
-            text-align: center;
-            max-width: 150px;
-        }
-
-        .addon-switch {
-            position: relative;
-            display: inline-block;
+        /* 添加预览窗口中的 Add On 开关样式 */
+        .preview-addon-switch {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
             cursor: pointer;
         }
 
-        .addon-switch input {
-            display: none;
+        /* Dark Mode 下的开关样式 */
+        body.dark-mode .preview-addon-switch {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        .addon-slider {
+        /* Light Mode 下的开关样式 */
+        body:not(.dark-mode) .preview-addon-switch {
+            background: rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .preview-addon-switch label {
             display: flex;
             align-items: center;
-            justify-content: center;
-            width: 140px;
-            height: 45px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(8px);
-            border-radius: 25px;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.4s ease;
-            overflow: hidden;
-            position: relative;
+            gap: 8px;
+            cursor: pointer;
         }
 
-        .addon-circle {
-            position: absolute;
-            left: 4px;
-            width: 37px;
-            height: 37px;
-            background: linear-gradient(45deg, #ff6b6b, #feca57);
-            border-radius: 50%;
-            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            transform: translateX(0);
-        }
-
-        .addon-text {
-            color: white;
-            font-weight: bold;
-            font-size: 0.9em;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-            transition: all 0.4s ease;
-            margin-left: 45px;
-        }
-
-        /* 选中状态 */
-        .addon-switch input:checked + .addon-slider {
+        .preview-addon-switch input[type="checkbox"] {
+            width: 40px;
+            height: 20px;
+            appearance: none;
             background: rgba(255, 255, 255, 0.2);
-            box-shadow: 0 0 20px rgba(255, 123, 0, 0.3);
+            border-radius: 20px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
 
-        .addon-switch input:checked + .addon-slider .addon-circle {
-            transform: translateX(95px);
-            background: linear-gradient(45deg, #ff9f43, #ff6b6b);
+        .preview-addon-switch input[type="checkbox"]::before {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            background: #fff;
+            transition: all 0.3s ease;
         }
 
-        .addon-switch input:checked + .addon-slider .addon-text {
-            margin-left: -45px;
-            color: #ffd32a;
+        .preview-addon-switch input[type="checkbox"]:checked {
+            background: #4CAF50;
         }
 
-        /* 悬停效果 */
-        .addon-slider:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        .preview-addon-switch input[type="checkbox"]:checked::before {
+            transform: translateX(20px);
         }
 
-        .addon-slider:active {
-            transform: translateY(0);
+        /* Dark Mode 文字样式 */
+        body.dark-mode .preview-addon-switch span {
+            color: #ffffff;
         }
 
-        /* 深色模式适配 */
-        body.dark-mode .addon-slider {
-            background: rgba(0, 0, 0, 0.2);
+        /* Light Mode 文字样式 */
+        body:not(.dark-mode) .preview-addon-switch span {
+            color: #333333;
         }
 
-        body.dark-mode .addon-switch input:checked + .addon-slider {
-            background: rgba(255, 123, 0, 0.15);
+        /* Light Mode 下的店铺卡片选中效果 */
+        body:not(.dark-mode) .shop-card.selected {
+            border: 2px solid #4CAF50;  /* 绿色边框 */
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.3);  /* 绿色阴影 */
+            background: rgba(76, 175, 80, 0.1);  /* 淡绿色背景 */
         }
 
-        /* 响应式调整 */
-        @media (max-width: 768px) {
-            .addon-container {
-                max-width: 130px;
-            }
-            
-            .addon-slider {
-                width: 120px;
-                height: 40px;
-            }
-            
-            .addon-circle {
-                width: 32px;
-                height: 32px;
-            }
-            
-            .addon-text {
-                font-size: 0.8em;
-            }
-            
-            .addon-switch input:checked + .addon-slider .addon-circle {
-                transform: translateX(80px);
-            }
+        /* Light Mode 下的分类卡片选中效果 */
+        body:not(.dark-mode) .category-card.selected {
+            border: 2px solid #2196F3;  /* 蓝色边框 */
+            box-shadow: 0 0 15px rgba(33, 150, 243, 0.3);  /* 蓝色阴影 */
+            background: rgba(33, 150, 243, 0.1);  /* 淡蓝色背景 */
+        }
+
+        /* Light Mode 下卡片的悬停效果 */
+        body:not(.dark-mode) .shop-card:hover,
+        body:not(.dark-mode) .category-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Light Mode 下选中卡片的悬停效果 */
+        body:not(.dark-mode) .shop-card.selected:hover {
+            background: rgba(76, 175, 80, 0.15);  /* 稍深的淡绿色背景 */
+        }
+
+        body:not(.dark-mode) .category-card.selected:hover {
+            background: rgba(33, 150, 243, 0.15);  /* 稍深的淡蓝色背景 */
         }
     </style>
 </head>
@@ -624,6 +726,13 @@
         <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
             <span>订单预览</span>
             <span style="cursor: pointer;" onclick="togglePreview()">×</span>
+        </div>
+        <!-- 添加 Add On 开关 -->
+        <div class="preview-addon-switch">
+            <label>
+                <input type="checkbox" id="addOnCheckbox" onchange="updatePreview()">
+                <span>Add On</span>
+            </label>
         </div>
         <div id="preview-content"></div>
         <!-- 添加分隔线和WhatsApp按钮 -->
@@ -661,16 +770,6 @@
     <button class="toggle-mode-btn" onclick="toggleDarkMode()">Light Mode🌞</button>
 
     <h1>Stock Order</h1>
-    <div class="addon-container">
-        <label class="addon-switch">
-            <input type="checkbox" id="addOnCheckbox" onchange="updatePreview()">
-            <span class="addon-slider">
-                <span class="addon-circle"></span>
-                <span class="addon-text">Add On</span>
-            </span>
-        </label>
-    </div>
-
     <h3>选择店铺</h3>
     <div class="shop-container">
         <div class="shop-card" onclick="selectShop(this, '*JKL*')">
@@ -795,7 +894,8 @@
                             const productName = label.textContent;
                             const stock = stockMap[productName];
                             if (stock !== undefined) {
-                                label.innerHTML = `${productName} <span style="color: red; font-size: 0.9em;">(Stock: ${stock})</span>`;
+                                const stockClass = stock === 0 ? 'zero-stock' : '';
+                                label.innerHTML = `${productName} <span class="${stockClass}">(Stock: ${stock})</span>`;
                             }
                         });
 
@@ -1211,10 +1311,11 @@
 
                         if (stockInfo && stockInfo.c[1]) {
                             const stock = stockInfo.c[1].v;
+                            const stockClass = stock === 0 ? 'zero-stock' : '';
                             // 更新特定商品的标签
                             const label = document.querySelector(`label[for="item${product.id}"]`);
                             if (label) {
-                                label.innerHTML = `${productName} <span style="color: #666; font-size: 0.9em;">(Stock:${stock})</span>`;
+                                label.innerHTML = `${productName} <span class="${stockClass}">(Stock: ${stock})</span>`;
                             }
                         }
                     } catch (error) {
