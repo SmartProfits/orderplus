@@ -1134,7 +1134,7 @@
             toggleItems(); // 确保激活商品选择框
         }
 
-        function generateText() {
+        function generateText(forWhatsApp = false) {
             let result = '';
             let selectedStore = document.querySelector('input[name="store"]:checked');
             let hasAddOn = document.getElementById('addOnCheckbox').checked;
@@ -1185,11 +1185,17 @@
                 if (items.length > 0) {
                     result += `\n=== ${category} ===\n`;
                     items.forEach(item => {
-                        // 如果库存为0，添加 HTML 样式标签使文本变红
-                        const itemName = item.stock === 0 ? 
-                            `<span style="color: #ff4444;">${item.name}</span>` :
-                            item.name;
-                        result += `${itemName} - ${item.quantity} ${item.unit}\n`;
+                        // 根据是否为WhatsApp使用不同的格式
+                        if (forWhatsApp) {
+                            // WhatsApp版本 - 纯文本
+                            result += `${item.name} - ${item.quantity} ${item.unit}\n`;
+                        } else {
+                            // 预览窗口版本 - 带HTML样式
+                            const itemName = item.stock === 0 ? 
+                                `<span style="color: #ff4444;">${item.name}</span>` :
+                                item.name;
+                            result += `${itemName} - ${item.quantity} ${item.unit}\n`;
+                        }
                     });
                 }
             }
@@ -1199,7 +1205,8 @@
         }
 
         function copyAndSendWhatsApp() {
-            let text = generateText();
+            // 使用 generateText(true) 来获取纯文本版本
+            let text = generateText(true);
             navigator.clipboard.writeText(text).then(() => {
                 alert('文字已复制，现在跳转到WhatsApp');
                 let whatsappURL = `https://wa.me/?text=${encodeURIComponent(text)}`;
@@ -1384,23 +1391,9 @@
 
         // 修改 updatePreview 函数
         function updatePreview() {
-            const previewWindow = document.getElementById('preview-window');
-            const previewIcon = document.getElementById('preview-icon');
             const previewContent = document.getElementById('preview-content');
-            
-            if (Object.keys(selectedItems).length === 0) {
-                previewWindow.style.display = 'none';
-                previewIcon.style.display = 'none';
-                return;
-            }
-            
-            if (allowAutoShow) {
-                previewWindow.style.display = 'block';
-                previewIcon.style.display = 'none';
-            }
-            
-            // 生成预览内容并设置为 HTML，将换行符转换为 <br>
-            const text = generateText();
+            // 使用 generateText(false) 来获取带HTML标签的版本
+            const text = generateText(false);
             previewContent.innerHTML = text.replace(/\n/g, '<br>');
         }
 
