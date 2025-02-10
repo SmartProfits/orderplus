@@ -1,10 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-    <!-- 添加 Chrome 特定的元标签 -->
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <link rel="dns-prefetch" href="https://ajax.googleapis.com">
-    <link rel="preconnect" href="https://ajax.googleapis.com">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -71,7 +67,7 @@
             box-shadow: inset 3px 3px 5px rgba(0, 0, 0, 0.1),
                         inset -1px -1px 5px rgba(255, 255, 255, 1);
             transform: scale(0);
-            animation: animateDots 2s linear infinite;
+            animation: animateDots 3.5s linear infinite, animateColor 5s linear infinite;
             animation-delay: calc(var(--i) * 0.2s);
         }
 
@@ -102,32 +98,6 @@
             color: #333;
             transition: background-color 0.3s, color 0.3s;
             min-height: 100vh;
-            /* 启用硬件加速 */
-            transform: translateZ(0);
-            -webkit-transform: translateZ(0);
-            -ms-transform: translateZ(0);
-            
-            /* 优化滚动性能 */
-            -webkit-overflow-scrolling: touch;
-            
-            /* 优化动画性能 */
-            will-change: transform;
-            background-size: 200% 200%; /* 控制渐变大小 */
-            background-position: 0 0;
-            transition: background-position 0.3s ease;
-
-            /* Chrome 特定的性能优化 */
-            /* 启用 Chrome 的层压缩 */
-            contain: layout style paint;
-            
-            /* 启用 Chrome 的平滑滚动 */
-            scroll-behavior: smooth;
-            
-            /* 启用 Chrome 的内容可见性优化 */
-            content-visibility: auto;
-            
-            /* 提示 Chrome 内容的大致高度 */
-            contain-intrinsic-size: 1px 5000px;
         }
 
         /* Light Mode 的背景和文字颜色 */
@@ -145,21 +115,11 @@
         /* 添加玻璃态效果的通用类 */
         .glass-effect {
             background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(5px); /* 降低模糊半径 */
-            -webkit-backdrop-filter: blur(5px);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 4px 6px rgba(31, 38, 135, 0.2); /* 简化阴影 */
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
             border-radius: 10px;
-            /* 启用硬件加速 */
-            transform: translateZ(0);
-            -webkit-transform: translateZ(0);
-            
-            /* 优化动画性能 */
-            will-change: transform, opacity;
-            
-            /* 使用更高性能的属性 */
-            backface-visibility: hidden;
-            perspective: 1000;
         }
 
         /* Light Mode 下的玻璃态效果和文字颜色 */
@@ -445,13 +405,23 @@
 
         /* 添加标题动画效果 */
         @keyframes glowingTitle {
-            0%, 100% {
+            0% {
+                text-shadow: 0 0 5px rgba(255, 255, 255, 0.8),
+                             0 0 10px rgba(255, 255, 255, 0.8),
+                             0 0 15px rgba(255, 255, 255, 0.8);
                 transform: translateY(0);
-                text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
             }
             50% {
-                transform: translateY(-3px);
-                text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.8),
+                             0 0 35px rgba(255, 255, 255, 0.8),
+                             0 0 40px rgba(255, 255, 255, 0.8);
+                transform: translateY(-5px);
+            }
+            100% {
+                text-shadow: 0 0 5px rgba(255, 255, 255, 0.8),
+                             0 0 10px rgba(255, 255, 255, 0.8),
+                             0 0 15px rgba(255, 255, 255, 0.8);
+                transform: translateY(0);
             }
         }
 
@@ -618,10 +588,10 @@
         @keyframes ripple {
             0% {
                 transform: scale(0);
-                opacity: 0.5;
+                opacity: 1;
             }
             100% {
-                transform: scale(2);
+                transform: scale(4);
                 opacity: 0;
             }
         }
@@ -746,84 +716,6 @@
 
         body:not(.dark-mode) #settings-panel button:hover {
             background: #f5f5f5;
-        }
-
-        /* 添加性能优化相关的 CSS */
-        body {
-            /* 启用硬件加速 */
-            transform: translateZ(0);
-            -webkit-transform: translateZ(0);
-            -ms-transform: translateZ(0);
-            
-            /* 优化滚动性能 */
-            -webkit-overflow-scrolling: touch;
-            
-            /* 优化动画性能 */
-            will-change: transform;
-        }
-        
-        /* 优化所有动画元素 */
-        .shop-card,
-        .category-card,
-        .glass-effect,
-        #preview-window,
-        #preview-icon,
-        #settings-panel,
-        .ripple {
-            /* 启用硬件加速 */
-            transform: translateZ(0);
-            -webkit-transform: translateZ(0);
-            
-            /* 优化动画性能 */
-            will-change: transform, opacity;
-            
-            /* 使用更高性能的属性 */
-            backface-visibility: hidden;
-            perspective: 1000;
-        }
-        
-        /* 优化涟漪动画性能 */
-        @keyframes ripple {
-            0% {
-                transform: scale(0) translateZ(0);
-                opacity: 1;
-            }
-            100% {
-                transform: scale(4) translateZ(0);
-                opacity: 0;
-            }
-        }
-        
-        /* 优化标题动画性能 */
-        @keyframes glowingTitle {
-            0% {
-                transform: translateY(0) translateZ(0);
-                text-shadow: 0 0 5px rgba(255, 255, 255, 0.8),
-                             0 0 10px rgba(255, 255, 255, 0.8),
-                             0 0 15px rgba(255, 255, 255, 0.8);
-            }
-            50% {
-                transform: translateY(-5px) translateZ(0);
-                text-shadow: 0 0 20px rgba(255, 255, 255, 0.8),
-                             0 0 35px rgba(255, 255, 255, 0.8),
-                             0 0 40px rgba(255, 255, 255, 0.8);
-            }
-            100% {
-                transform: translateY(0) translateZ(0);
-                text-shadow: 0 0 5px rgba(255, 255, 255, 0.8),
-                             0 0 10px rgba(255, 255, 255, 0.8),
-                             0 0 15px rgba(255, 255, 255, 0.8);
-            }
-        }
-        
-        /* 优化加载动画性能 */
-        @keyframes animateDots {
-            0%, 9.99%, 70.001% {
-                transform: scale(0) translateZ(0);
-            }
-            10%, 70% {
-                transform: scale(1) translateZ(0);
-            }
         }
     </style>
 </head>
@@ -979,7 +871,7 @@
             <input type="radio" name="store" value="*JKL*" id="jkl">
             <label for="jkl">
                 <span class="shop-icon">🛍️</span>
-                <span class="shop-name">JKLl</span>
+                <span class="shop-name">JKL</span>
             </label>
         </div>
         <div class="shop-card" onclick="selectShop(this, '*TOM*')">
@@ -1271,8 +1163,8 @@
 
         function loadProducts(products) {
             const productList = document.getElementById('productList');
-            const fragment = document.createDocumentFragment();
-            
+            productList.innerHTML = '';
+
             products.forEach(product => {
                 const div = document.createElement('div');
                 const isChecked = selectedItems[product.id] ? 'checked' : '';
@@ -1291,17 +1183,11 @@
                            readonly>
                     <button class="quantity-btn" onclick="changeQuantity(${product.id}, -1)">-</button>
                 `;
-                fragment.appendChild(div);
+                productList.appendChild(div);
             });
-            
-            // 批量更新 DOM
-            productList.innerHTML = '';
-            productList.appendChild(fragment);
-            
-            // 延迟加载库存信息
-            requestIdleCallback(() => {
-                loadQuantitiesFromSheet();
-            });
+
+            // 加载并显示库存数量
+            loadQuantitiesFromSheet();
         }
 
         // 添加震动相关的函数和变量
@@ -1734,140 +1620,6 @@
                 settingsPanel.style.display = 'none';
             }
         });
-
-        // 添加帧率优化相关的代码
-        function optimizePerformance() {
-            // 使用 IntersectionObserver 优化滚动
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.style.visibility = 'visible';
-                        entry.target.style.opacity = '1';
-                    } else {
-                        entry.target.style.visibility = 'hidden';
-                        entry.target.style.opacity = '0';
-                    }
-                });
-            }, {
-                threshold: 0.1
-            });
-
-            // 监视所有商品项
-            document.querySelectorAll('#productList div').forEach(item => {
-                observer.observe(item);
-            });
-
-            // 防抖函数
-            function debounce(func, wait) {
-                let timeout;
-                return function executedFunction(...args) {
-                    const later = () => {
-                        clearTimeout(timeout);
-                        func(...args);
-                    };
-                    clearTimeout(timeout);
-                    timeout = setTimeout(later, wait);
-                };
-            }
-
-            // 优化滚动和调整大小事件
-            const debouncedScroll = debounce(() => {
-                // 处理滚动事件
-            }, 16); // 约60fps
-
-            const debouncedResize = debounce(() => {
-                // 处理窗口调整大小事件
-            }, 16);
-
-            window.addEventListener('scroll', debouncedScroll, { passive: true });
-            window.addEventListener('resize', debouncedResize, { passive: true });
-
-            // 使用 requestIdleCallback 处理非关键任务
-            if ('requestIdleCallback' in window) {
-                requestIdleCallback(() => {
-                    // 预加载图片等资源
-                    // 初始化不急需的功能
-                });
-            }
-
-            // 启用 Chrome 特定的优化
-            chromeOptimize();
-
-            // 使用 Chrome 的 ResizeObserver
-            if ('ResizeObserver' in window) {
-                const resizeObserver = new ResizeObserver(entries => {
-                    for (const entry of entries) {
-                        // 优化调整大小的性能
-                        if (entry.target.classList.contains('glass-effect')) {
-                            entry.target.style.willChange = 'transform';
-                            requestAnimationFrame(() => {
-                                entry.target.style.willChange = 'auto';
-                            });
-                        }
-                    }
-                });
-
-                // 观察所有玻璃效果元素
-                document.querySelectorAll('.glass-effect').forEach(el => resizeObserver.observe(el));
-            }
-        }
-
-        // 在页面加载时初始化性能优化
-        window.addEventListener('load', function() {
-            optimizePerformance();
-            // ... existing load event code ...
-        });
-
-        // Chrome 特定的性能优化
-        function chromeOptimize() {
-            // 使用 Chrome 的 Layers Panel 来监控渲染性能
-            if (window.chrome && window.chrome.loadTimes) {
-                console.log('Chrome 优化已启用');
-            }
-
-            // 使用 Chrome 的 requestIdleCallback
-            if ('requestIdleCallback' in window) {
-                requestIdleCallback(() => {
-                    // 延迟加载非关键资源
-                    loadDeferredContent();
-                }, { timeout: 2000 });
-            }
-
-            // 使用 Chrome 的 Performance API
-            if ('performance' in window) {
-                // 监控关键性能指标
-                const observer = new PerformanceObserver((list) => {
-                    for (const entry of list.getEntries()) {
-                        // 记录性能数据
-                        console.log(`${entry.name}: ${entry.startTime}`, entry);
-                    }
-                });
-
-                // 监控布局性能
-                observer.observe({ entryTypes: ['layout-shift', 'largest-contentful-paint', 'first-input'] });
-            }
-        }
-
-        // 延迟加载非关键内容
-        function loadDeferredContent() {
-            // 使用 Intersection Observer 延迟加载图片和其他内容
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        if (entry.target.dataset.src) {
-                            entry.target.src = entry.target.dataset.src;
-                            observer.unobserve(entry.target);
-                        }
-                    }
-                });
-            }, {
-                rootMargin: '50px 0px',
-                threshold: 0.1
-            });
-
-            // 观察所有需要延迟加载的元素
-            document.querySelectorAll('[data-src]').forEach(img => observer.observe(img));
-        }
     </script>
 
     <p class="contact-info">🌟If you have any questions or suggestion please contact me (Mark).<br>🌟Rowan now will help me to update stock amount.</p>
