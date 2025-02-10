@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
+    <!-- 添加 Chrome 特定的元标签 -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <link rel="dns-prefetch" href="https://ajax.googleapis.com">
+    <link rel="preconnect" href="https://ajax.googleapis.com">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -111,6 +115,19 @@
             background-size: 200% 200%; /* 控制渐变大小 */
             background-position: 0 0;
             transition: background-position 0.3s ease;
+
+            /* Chrome 特定的性能优化 */
+            /* 启用 Chrome 的层压缩 */
+            contain: layout style paint;
+            
+            /* 启用 Chrome 的平滑滚动 */
+            scroll-behavior: smooth;
+            
+            /* 启用 Chrome 的内容可见性优化 */
+            content-visibility: auto;
+            
+            /* 提示 Chrome 内容的大致高度 */
+            contain-intrinsic-size: 1px 5000px;
         }
 
         /* Light Mode 的背景和文字颜色 */
@@ -962,7 +979,7 @@
             <input type="radio" name="store" value="*JKL*" id="jkl">
             <label for="jkl">
                 <span class="shop-icon">🛍️</span>
-                <span class="shop-name">JKL</span>
+                <span class="shop-name">JKLl</span>
             </label>
         </div>
         <div class="shop-card" onclick="selectShop(this, '*TOM*')">
@@ -1772,6 +1789,27 @@
                     // 初始化不急需的功能
                 });
             }
+
+            // 启用 Chrome 特定的优化
+            chromeOptimize();
+
+            // 使用 Chrome 的 ResizeObserver
+            if ('ResizeObserver' in window) {
+                const resizeObserver = new ResizeObserver(entries => {
+                    for (const entry of entries) {
+                        // 优化调整大小的性能
+                        if (entry.target.classList.contains('glass-effect')) {
+                            entry.target.style.willChange = 'transform';
+                            requestAnimationFrame(() => {
+                                entry.target.style.willChange = 'auto';
+                            });
+                        }
+                    }
+                });
+
+                // 观察所有玻璃效果元素
+                document.querySelectorAll('.glass-effect').forEach(el => resizeObserver.observe(el));
+            }
         }
 
         // 在页面加载时初始化性能优化
@@ -1779,6 +1817,57 @@
             optimizePerformance();
             // ... existing load event code ...
         });
+
+        // Chrome 特定的性能优化
+        function chromeOptimize() {
+            // 使用 Chrome 的 Layers Panel 来监控渲染性能
+            if (window.chrome && window.chrome.loadTimes) {
+                console.log('Chrome 优化已启用');
+            }
+
+            // 使用 Chrome 的 requestIdleCallback
+            if ('requestIdleCallback' in window) {
+                requestIdleCallback(() => {
+                    // 延迟加载非关键资源
+                    loadDeferredContent();
+                }, { timeout: 2000 });
+            }
+
+            // 使用 Chrome 的 Performance API
+            if ('performance' in window) {
+                // 监控关键性能指标
+                const observer = new PerformanceObserver((list) => {
+                    for (const entry of list.getEntries()) {
+                        // 记录性能数据
+                        console.log(`${entry.name}: ${entry.startTime}`, entry);
+                    }
+                });
+
+                // 监控布局性能
+                observer.observe({ entryTypes: ['layout-shift', 'largest-contentful-paint', 'first-input'] });
+            }
+        }
+
+        // 延迟加载非关键内容
+        function loadDeferredContent() {
+            // 使用 Intersection Observer 延迟加载图片和其他内容
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        if (entry.target.dataset.src) {
+                            entry.target.src = entry.target.dataset.src;
+                            observer.unobserve(entry.target);
+                        }
+                    }
+                });
+            }, {
+                rootMargin: '50px 0px',
+                threshold: 0.1
+            });
+
+            // 观察所有需要延迟加载的元素
+            document.querySelectorAll('[data-src]').forEach(img => observer.observe(img));
+        }
     </script>
 
     <p class="contact-info">🌟If you have any questions or suggestion please contact me (Mark).<br>🌟Rowan now will help me to update stock amount.</p>
