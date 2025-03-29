@@ -284,6 +284,39 @@
             text-align: center;
             font-weight: bold;
         }
+
+        /* 为网格视图添加产品名称和库存的样式 */
+        #productList.grid-view .product-name {
+            margin-top: 5px;
+            display: block;
+            width: 100%;
+            text-align: center;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        #productList.grid-view .stock-info {
+            display: block;
+            width: 100%;
+            text-align: center;
+            font-size: 0.85em;
+            margin-top: 2px;
+            margin-bottom: 8px;
+            color: #00CED1 !important; /* 默认显示青色 */
+        }
+
+        #productList.grid-view .stock-info.zero-stock {
+            color: #ff4444 !important; /* 无库存显示红色 */
+        }
+
+        /* 黑暗模式下网格视图的库存信息颜色 */
+        body.dark-mode #productList.grid-view .stock-info {
+            color: #00CED1; /* 黑暗模式下保持青色 */
+        }
+
+        body.dark-mode #productList.grid-view .stock-info.zero-stock {
+            color: #ff4444; /* 黑暗模式下无库存保持红色 */
+        }
     </style>
     
     <script>
@@ -459,61 +492,6 @@
         /* 黑暗模式下的 stock 信息颜色 */
         body.dark-mode #productList label span {
             color: #ffd700;  /* 黄色 */
-        }
-        
-        /* 商品名称和库存信息样式 */
-        .product-name {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 4px;
-        }
-
-        .stock-info {
-            display: block;
-            font-size: 0.85em;
-            text-align: center;
-            color: #00CED1 !important;
-        }
-
-        .stock-info.zero-stock {
-            color: #ff4444 !important;
-        }
-
-        /* 黑暗模式下的库存信息颜色 */
-        body.dark-mode .stock-info {
-            color: #ffd700 !important;
-        }
-
-        /* 列表视图中的样式调整 */
-        #productList:not(.grid-view) .stock-info {
-            text-align: left;
-            margin-top: 2px;
-            margin-bottom: 4px;
-        }
-
-        /* 网格视图中的标签样式调整 */
-        #productList.grid-view label {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            width: 100%;
-        }
-
-        #productList.grid-view .product-name {
-            max-width: 100%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            margin-bottom: 6px;
-        }
-
-        /* 确保新品标记和库存信息在同一行 */
-        .new-badge {
-            vertical-align: middle;
-            font-size: 14px !important;
-            color: #ff4444;
         }
         
         /* 输入容器样式 */
@@ -2642,9 +2620,6 @@
                     
                     // 更新所有商品的显示
                     for (const [productId, product] of Object.entries(window.allProducts || {})) {
-                        const label = document.querySelector(`label[for="item${product.id}"]`);
-                        if (!label) continue;
-                        
                         // 检查是否是新品
                         const isNew = newProductsData[product.id];
                         const newUntil = isNew ? new Date(isNew.until) : null;
@@ -2665,26 +2640,33 @@
                         const stockClass = stock === 0 ? 'zero-stock' : '';
                         const stockText = stock === 0 ? '(No Stock)' : `(Stock: ${stock})`;
                         
-                        // 添加查看图片按钮（如果有图片URL）
-                        const viewImageButton = product.imageUrl ? 
-                            `<button class="view-image-btn" onclick="showImage('${product.imageUrl}', '${product.name}')">
-                                <span class="material-icons-outlined" style="font-size: 16px; vertical-align: middle; margin-right: 3px;">image</span>View
-                            </button>` : '';
-                        
-                        // 更新标签内容，使商品名称和库存信息分行显示
+                        // 区分网格视图和列表视图的更新方式
                         if (currentView === 'grid') {
-                            // 网格视图中，显示商品名称和库存分两行居中
-                            label.innerHTML = `
-                                <div class="product-name">${product.name}</div>
-                                <div class="stock-info ${stockClass}">${stockText} ${newBadge}</div>
-                            `;
+                            // 网格视图：更新独立的stock-info元素
+                            const stockElement = document.getElementById(`stock${product.id}`);
+                            if (stockElement) {
+                                stockElement.className = `stock-info ${stockClass}`;
+                                stockElement.innerHTML = `${stockText} ${newBadge}`;
+                            }
+                            
+                            // 确保产品名称正确显示
+                            const nameElement = document.querySelector(`span.product-name[for="item${product.id}"]`);
+                            if (nameElement) {
+                                nameElement.innerHTML = product.name;
+                            }
                         } else {
-                            // 列表视图中，保持原样但加上分行
-                            label.innerHTML = `
-                                <div class="product-name">${product.name}</div>
-                                <div class="stock-info ${stockClass}">${stockText} ${newBadge}</div>
-                                ${viewImageButton}
-                            `;
+                            // 列表视图：更新label内容
+                            const label = document.querySelector(`label[for="item${product.id}"]`);
+                            if (!label) continue;
+                            
+                            // 添加查看图片按钮（如果有图片URL）
+                            const viewImageButton = product.imageUrl ? 
+                                `<button class="view-image-btn" onclick="showImage('${product.imageUrl}', '${product.name}')">
+                                    <span class="material-icons-outlined" style="font-size: 16px; vertical-align: middle; margin-right: 3px;">image</span>View
+                                </button>` : '';
+                            
+                            // 更新标签内容，将新品标记放在库存文本旁边
+                            label.innerHTML = `${product.name} <span class="${stockClass}">${stockText} ${newBadge}</span> ${viewImageButton}`;
                         }
                     }
                 })
@@ -2915,10 +2897,12 @@
                         `<img src="${product.imageUrl}" alt="${product.name}" class="product-image">` : 
                         `<div class="product-image"><span class="material-icons">inventory_2</span></div>`;
                     
+                    // 在网格视图中，使用独立的元素显示产品名称和库存信息
                     div.innerHTML = `
                         <input type="checkbox" id="item${product.id}" ${isChecked} onchange="saveItem(${product.id}, '${product.name}')">
                         ${imageHTML}
-                        <label for="item${product.id}">${product.name}</label>
+                        <span class="product-name" for="item${product.id}" onclick="document.getElementById('item${product.id}').click()">${product.name}</span>
+                        <span class="stock-info" id="stock${product.id}"></span>
                         <div class="quantity-controls">
                             <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)">
                                 <span class="material-icons-round" style="font-size: 18px;">add</span>
@@ -2985,10 +2969,12 @@
                         `<img src="${product.imageUrl}" alt="${product.name}" class="product-image">` : 
                         `<div class="product-image"><span class="material-icons">inventory_2</span></div>`;
                     
+                    // 在网格视图中，使用独立的元素显示产品名称和库存信息
                     div.innerHTML = `
                         <input type="checkbox" id="item${product.id}" ${isChecked} onchange="saveItem(${product.id}, '${product.name}')">
                         ${imageHTML}
-                        <label for="item${product.id}">${product.name}</label>
+                        <span class="product-name" for="item${product.id}" onclick="document.getElementById('item${product.id}').click()">${product.name}</span>
+                        <span class="stock-info" id="stock${product.id}"></span>
                         <div class="quantity-controls">
                             <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)">
                                 <span class="material-icons-round" style="font-size: 18px;">add</span>
