@@ -199,6 +199,10 @@
             text-align: center;
             height: auto;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            /* 确保卡片高度一致 */
+            min-height: 180px;
+            /* 使用flex布局让内容均匀分布 */
+            justify-content: space-between;
         }
         
         body:not(.dark-mode) #productList.grid-view > div {
@@ -228,12 +232,38 @@
             z-index: 1;
         }
         
-        #productList.grid-view label {
+        #productList.grid-view .product-name {
             margin-top: 5px;
             display: block;
             width: 100%;
             text-align: center;
             font-weight: bold;
+            cursor: pointer;
+            /* 确保高度一致，溢出文本设置省略号 */
+            height: 2.4em;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+        
+        #productList.grid-view .stock-info {
+            display: block;
+            width: 100%;
+            text-align: center;
+            font-size: 0.85em;
+            margin-top: 2px;
+            margin-bottom: 8px;
+            color: #00CED1 !important; /* 默认显示青色 */
+        }
+        
+        #productList.grid-view .stock-info.zero-stock {
+            color: #ff4444 !important; /* 无库存显示红色 */
+        }
+        
+        body.dark-mode #productList.grid-view .stock-info.zero-stock {
+            color: #ff4444 !important; /* 黑暗模式下无库存保持红色 */
         }
         
         #productList.grid-view .quantity-controls {
@@ -258,6 +288,12 @@
             #productList.grid-view {
                 grid-template-columns: repeat(2, 1fr);
             }
+            
+            #productList.grid-view > div {
+                /* 确保在两列时卡片大小一致 */
+                min-height: 200px;
+                height: 100%;
+            }
         }
         
         @media (max-width: 480px) {
@@ -269,6 +305,11 @@
             #productList.grid-view .product-image {
                 width: 60px;
                 height: 60px;
+            }
+            
+            #productList.grid-view > div {
+                padding: 12px;
+                min-height: 180px;
             }
         }
 
