@@ -189,29 +189,28 @@
         }
         
         #productList.grid-view > div {
+            /* 基本卡片容器样式 */
+            background: rgba(255, 255, 255, 0.1); /* 恢复半透明背景 */
+            padding: 15px;
+            border-radius: 10px; /* 恢复原始圆角 */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* 恢复原始阴影 */
             display: flex;
             flex-direction: column;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 15px;
-            position: relative;
-            align-items: center;
-            text-align: center;
-            height: auto;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            /* 确保卡片高度一致 */
-            min-height: 180px;
-            /* 使用flex布局让内容均匀分布 */
             justify-content: space-between;
+            align-items: center;
+            min-height: 180px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden; /* 防止内容溢出 */
         }
         
         body:not(.dark-mode) #productList.grid-view > div {
-            background: rgba(0, 0, 0, 0.05);
+            background: rgba(0, 0, 0, 0.05); /* 保持非暗黑模式下的半透明样式 */
         }
         
         #productList.grid-view .product-image {
-            width: 80px;
-            height: 80px;
+            width: 100px;
+            height: 100px;
             margin-bottom: 10px;
             border-radius: 5px;
             object-fit: cover;
@@ -287,29 +286,78 @@
         @media (max-width: 768px) {
             #productList.grid-view {
                 grid-template-columns: repeat(2, 1fr);
+                gap: 12px; /* 减小间距以增加卡片空间 */
+                padding: 0 5px; /* 减小外边距 */
             }
             
             #productList.grid-view > div {
                 /* 确保在两列时卡片大小一致 */
                 min-height: 200px;
                 height: 100%;
+                width: 100%; /* 确保卡片占满列宽 */
+                max-width: 100%; /* 防止溢出 */
+                box-sizing: border-box; /* 确保内边距计入宽度 */
+            }
+            
+            #productList.grid-view .product-name {
+                font-size: 0.95rem; /* 稍微缩小字体 */
+                line-height: 1.2; /* 减小行高 */
+                height: 2.4em; /* 2行高度限制 */
+                overflow: hidden;
+                text-overflow: ellipsis;
+                display: -webkit-box;
+                -webkit-box-orient: vertical;
+                -webkit-line-clamp: 2; /* 限制为两行 */
+                margin-bottom: 4px;
+            }
+            
+            #productList.grid-view .price {
+                font-size: 0.9rem; /* 稍微减小价格字体 */
             }
         }
         
         @media (max-width: 480px) {
             #productList.grid-view {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 10px;
-            }
-            
-            #productList.grid-view .product-image {
-                width: 60px;
-                height: 60px;
+                gap: 8px; /* 在小屏幕上进一步减小间距 */
+                padding: 0; /* 移除外边距 */
             }
             
             #productList.grid-view > div {
-                padding: 12px;
+                padding: 10px; /* 减小内边距以增加内容区域 */
                 min-height: 180px;
+                width: 100%; /* 确保卡片占满列宽 */
+            }
+            
+            #productList.grid-view .product-image {
+                width: 80px; /* 稍微减小图片尺寸 */
+                height: 80px;
+            }
+            
+            #productList.grid-view .product-name {
+                font-size: 0.9rem; /* 进一步缩小字体 */
+                -webkit-line-clamp: 2; /* 仍保持两行 */
+                margin: 3px 0;
+            }
+            
+            #productList.grid-view .price {
+                font-size: 0.85rem; /* 更小的价格字体 */
+            }
+            
+            #productList.grid-view .stock-info {
+                font-size: 0.8em; /* 减小库存信息字体 */
+                margin: 1px 0 5px 0; /* 缩小边距 */
+            }
+            
+            #productList.grid-view .product-buttons {
+                display: flex;
+                justify-content: center;
+                gap: 5px; /* 减小按钮间距 */
+            }
+            
+            #productList.grid-view button {
+                padding: 4px 8px; /* 减小按钮内边距 */
+                font-size: 0.8rem; /* 减小按钮字体 */
             }
         }
 
@@ -552,9 +600,11 @@
         .shop-container {
             display: grid;
             grid-template-columns: repeat(2, 1fr) !important; /* 强制2列 */
-            gap: 20px;
-            margin: 20px 0;
+            gap: 12px; /* 减小间距 */
+            margin: 15px 0;
             width: 100%;
+            padding: 0 5px; /* 添加少量内边距 */
+            box-sizing: border-box;
         }
 
         .container {
