@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh">
 <head>
@@ -831,23 +832,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 </head>
 <body>
-    <div class="container">
-        <div class="loader">
-            <span style="--i:1;"></span>
-            <span style="--i:2;"></span>
-            <span style="--i:3;"></span>
-            <span style="--i:4;"></span>
-            <span style="--i:5;"></span>
-            <span style="--i:6;"></span>
-            <span style="--i:7;"></span>
-        </div>
-    </div>
-
-    <button class="toggle-mode-btn" onclick="toggleMode()">Dark Mode🌑</button>
-    <button class="settings-btn" onclick="toggleSettings()" style="margin-left: 10px;">⚙️ 设置</button>
-    
-    <h1>Airport Stock Request</h1>
-
     <!-- 在 body 开始处添加浮动预览窗口 -->
     <div id="preview-window" style="
         position: fixed;
@@ -986,6 +970,7 @@
         </div>
     </div>
 
+    <h1>Stock Order</h1>
     <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0;">
         <h3 style="margin: 0;">Select Shop</h3>
         <!-- 这里保留设置按钮 -->
@@ -1129,33 +1114,6 @@
 
     <div class="setting-menu">
         <!-- 删除这两个设置项 -->
-    </div>
-
-    <div id="settings-panel" class="glass-effect" style="padding: 15px; margin-top: 15px; display: none;">
-        <h3>设置</h3>
-        <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
-            <div>
-                <label for="language-select">语言:</label>
-                <select id="language-select" onchange="changeLanguage(this.value)">
-                    <option value="zh">中文</option>
-                    <option value="en">English</option>
-                </select>
-            </div>
-            
-            <div>
-                <label for="performance-mode">低性能模式:</label>
-                <input type="checkbox" id="performance-mode" onchange="togglePerformanceMode()">
-            </div>
-            
-            <div>
-                <label for="text-format-select">WhatsApp 文本格式:</label>
-                <select id="text-format-select" onchange="saveTextFormatPreference(this.value)">
-                    <option value="aligned">对齐格式（全角空格）</option>
-                    <option value="simple">简单格式（短横线）</option>
-                    <option value="table">表格格式（制表符）</option>
-                </select>
-            </div>
-        </div>
     </div>
 
     <script>
@@ -1589,36 +1547,6 @@
             toggleItems(); // 确保激活商品选择框
         }
 
-        // 添加保存文本格式偏好的函数
-        function saveTextFormatPreference(format) {
-            localStorage.setItem('text-format', format);
-        }
-
-        // 获取文本格式偏好
-        function getTextFormatPreference() {
-            return localStorage.getItem('text-format') || 'aligned'; // 默认使用对齐格式
-        }
-
-        // 显示设置面板
-        function toggleSettings() {
-            const settingsPanel = document.getElementById('settings-panel');
-            if (settingsPanel.style.display === 'none' || !settingsPanel.style.display) {
-                settingsPanel.style.display = 'block';
-            } else {
-                settingsPanel.style.display = 'none';
-            }
-        }
-
-        // 加载用户设置
-        function loadUserSettings() {
-            // 加载文本格式偏好
-            const textFormat = getTextFormatPreference();
-            document.getElementById('text-format-select').value = textFormat;
-            
-            // 加载其他设置...
-        }
-
-        // 修改 generateText 函数以支持不同的文本格式
         function generateText(forWhatsApp = false) {
             let result = '';
             let selectedStore = document.querySelector('input[name="store"]:checked');
@@ -1670,57 +1598,25 @@
                 if (items.length > 0) {
                     result += `\n=== ${category} ===\n`;
                     
-                    // 只有在WhatsApp模式下才需要特殊格式
                     if (forWhatsApp) {
-                        const textFormat = getTextFormatPreference();
+                        // 为 WhatsApp 创建整齐排列的文本
+                        // 使用代码块格式，这样在 WhatsApp 中会使用等宽字体
+                        result += "```\n"; // 开始代码块
                         
-                        // 找出最长商品名称的长度，用于计算填充空格
-                        let maxNameLength = 0;
-                        if (textFormat === 'aligned' || textFormat === 'table') {
-                            items.forEach(item => {
-                                maxNameLength = Math.max(maxNameLength, item.name.length);
-                            });
-                            
-                            // 确保有足够的空间进行排版
-                            maxNameLength = Math.min(maxNameLength, 20); // 限制最大长度为20个字符
-                        }
+                        // 找出最长的商品名称长度，用于对齐
+                        const maxNameLength = Math.max(...items.map(item => item.name.length));
+                        // 设置一个最大长度限制，防止过长的名称破坏格式
+                        const nameColumnWidth = Math.min(maxNameLength, 30);
                         
                         items.forEach(item => {
-                            let productName = item.name;
-                            // 如果商品名称过长，进行裁剪
-                            if (productName.length > 20) {
-                                productName = productName.substring(0, 17) + "...";
-                            }
-                            
-                            // 根据选择的格式应用不同的文本格式
-                            switch (textFormat) {
-                                case 'aligned':
-                                    // 对齐格式（使用全角空格）
-                                    let paddedName = productName;
-                                    while (paddedName.length < maxNameLength) {
-                                        paddedName += "　"; // 全角空格
-                                    }
-                                    result += `${paddedName}　${item.quantity} ${item.unit}\n`;
-                                    break;
-                                    
-                                case 'simple':
-                                    // 简单格式（使用短横线）
-                                    result += `${productName} - ${item.quantity} ${item.unit}\n`;
-                                    break;
-                                    
-                                case 'table':
-                                    // 表格格式（模拟表格效果）
-                                    // 使用特殊字符如中文括号或方括号来创建表格效果
-                                    result += `【${productName}】 ${item.quantity} ${item.unit}\n`;
-                                    break;
-                                    
-                                default:
-                                    // 默认格式
-                                    result += `${productName} - ${item.quantity} ${item.unit}\n`;
-                            }
+                            // 计算需要添加多少空格来对齐
+                            const spaces = " ".repeat(Math.max(2, nameColumnWidth - item.name.length + 2));
+                            result += `${item.name}${spaces}${item.quantity} ${item.unit}\n`;
                         });
+                        
+                        result += "```\n"; // 结束代码块
                     } else {
-                        // 预览窗口版本 - HTML格式保持不变
+                        // 预览窗口版本 - 带HTML样式
                         items.forEach(item => {
                             const itemName = item.stock === 0 ? 
                                 `<span style="color: #ff4444;">${item.name}</span>` :
@@ -1812,9 +1708,6 @@
             document.body.classList.add('dark-mode');
             document.querySelector('.toggle-mode-btn').textContent = 'Light Mode🌞';
             localStorage.setItem('dark-mode', 'enabled');
-            
-            // 加载用户设置
-            loadUserSettings();
             
             toggleItems(); // 初始化商品选择框
             
