@@ -209,8 +209,8 @@
         }
         
         #productList.grid-view .product-image {
-            width: 100px;
-            height: 100px;
+            width: 80px;
+            height: 80px;
             margin-bottom: 10px;
             border-radius: 5px;
             object-fit: cover;
@@ -330,8 +330,8 @@
             }
             
             #productList.grid-view .product-image {
-                width: 80px; /* 稍微减小图片尺寸 */
-                height: 80px;
+                width: 55px; /* 稍微减小图片尺寸 */
+                height: 55px;
             }
             
             #productList.grid-view .product-name {
@@ -2118,6 +2118,13 @@
                 <span class="shop-name">Ole-Ole Tawau</span>
             </label>
         </div>
+		        <div class="shop-card" onclick="selectShop(this, '*Wisma Merdeka*')">
+            <input type="radio" name="store" value="*Wisma Merdeka*" id="wm">
+            <label for="wm">
+                <span class="shop-icon">🏢</span>
+                <span class="shop-name">Wisma Merdeka</span>
+            </label>
+        </div>
     </div>
 
     <h3>Category</h3>
@@ -2213,14 +2220,14 @@
     <script>
         // 认证用Firebase配置
         const authFirebaseConfig = {
-            apiKey: "AIzaSyBO5zgKEHDE4hkVdWOVVpcpodB7Sl1UUro",
-            authDomain: "angpao-da62f.firebaseapp.com",
-            databaseURL: "https://angpao-da62f-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "angpao-da62f",
-            storageBucket: "angpao-da62f.firebasestorage.app",
-            messagingSenderId: "303412944902",
-            appId: "1:303412944902:web:0e9c30451c4cc37258a387",
-            measurementId: "G-WDX94CKZ1Q"
+            apiKey: "AIzaSyCiwlw10jP3RTyLZ69bh0fAqZjUSwD59Xc",
+  authDomain: "order-pro-c0af9.firebaseapp.com",
+  databaseURL: "https://order-pro-c0af9-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "order-pro-c0af9",
+  storageBucket: "order-pro-c0af9.firebasestorage.app",
+  messagingSenderId: "1062589065402",
+  appId: "1:1062589065402:web:499c586bdfb399a461ba83",
+  measurementId: "G-4W7C1FKW1M"
         };
         
         // 库存查询用Firebase配置
@@ -2727,7 +2734,15 @@
                         if ([601, 602, 603].includes(product.id)) { // 这三个商品的ID
                             stock = Math.floor(stock / 60); // 取整数部分
                         }
-                
+                         if ([604, 605].includes(product.id)) { // 这三个商品的ID
+                            stock = Math.floor(stock / 30); // 取整数部分
+                        }
+                        if ([606, 609, 610].includes(product.id)) { // 这三个商品的ID
+                            stock = Math.floor(stock / 80); // 取整数部分
+                        }
+                        if ([607, 608].includes(product.id)) { // 这三个商品的ID
+                            stock = Math.floor(stock / 70); // 取整数部分
+                        }
                         const stockClass = stock === 0 ? 'zero-stock' : '';
                         const stockText = stock === 0 ? '(No Stock)' : `(Stock: ${stock})`;
                         
@@ -2837,6 +2852,7 @@
                 { id: 157, name: "BH Dodol Coconut" },
                 { id: 158, name: "BH Dodol Pandan" },
                 { id: 159, name: "BH Durian Beh Teh Saw" },
+		{ id: 168, name: "Coconut Chip 50g" },
                 { id: 163, name: "Fruity Marshmallow" },
                 { id: 164, name: "Matcha Marshmallow" },
                 { id: 165, name: "Durian Marshmallow" },
@@ -2858,6 +2874,7 @@
                 { id: 213, name: "Salted Egg Fish Skin" },
                 { id: 214, name: "Salted Egg Fish Skin Spicy" },
                 { id: 215, name: "Salted Egg Salmon Skin" },
+		{ id: 222, name: "Salted Egg Salmon Skin Spicy" },
                 { id: 216, name: "Musang King Durian Candy" },
                 { id: 217, name: "HH Durian Cookies" },
                 { id: 218, name: "Fish Chips Classic" },
@@ -2914,9 +2931,16 @@
                 { id: 515, name: "Kopi Tenom Red" }
             ],
             Amplang: [
-                { id: 601, name: "Amplang Ikan", unit: 'pkt', defaultQuantity: 1 },
-                { id: 602, name: "Amplang Udang", unit: 'pkt', defaultQuantity: 1 },
-                { id: 603, name: "Amplang Sotong", unit: 'pkt', defaultQuantity: 1 }
+                { id: 601, name: "Amplang Ikan", unit: 'bdl', defaultQuantity: 1 },
+                { id: 602, name: "Amplang Udang", unit: 'bdl', defaultQuantity: 1 },
+                { id: 603, name: "Amplang Sotong", unit: 'bdl', defaultQuantity: 1 },
+				{ id: 604, name: "Amplang Ikan 30Pkt", unit: 'bdl', defaultQuantity: 1 },
+                { id: 605, name: "Amplang Udang 30pkt", unit: 'bdl', defaultQuantity: 1 },
+		{ id: 606, name: "Amplang Pandan 180g", unit: 'bdl', defaultQuantity: 1 },
+		{ id: 607, name: "Amplang Tomyum 180g", unit: 'bdl', defaultQuantity: 1 },
+		{ id: 608, name: "Amplang Sotong 200g", unit: 'bdl', defaultQuantity: 1 },
+		{ id: 609, name: "Amplang Udang 200g", unit: 'bdl', defaultQuantity: 1 },
+		{ id: 610, name: "Amplang Ikan 200g", unit: 'bdl', defaultQuantity: 1 }
             ],
             Other: [
                  { id: 701, name: "Fruity Gummy Assorted" },
@@ -2928,6 +2952,7 @@
                 { id: 705, name: "Anchovy Green" },
                 { id: 706, name: "Anchovy Red" },
                 { id: 707, name: "Anchovy Yellow" },
+		{ id: 713, name: "A1 Bak Kut Teh" },
                 { id: 708, name: "Prawn Cracker 500g", unit: 'pkt' },
                 { id: 709, name: "Fish Maw", unit: 'pkt' }
             ],
@@ -3352,7 +3377,7 @@
                 }
             }
 
-            result += '\n_App Version 1.2_';
+            result += '\n_App Version 1.3_';
             return result;
         }
 
@@ -3360,11 +3385,18 @@
             // 使用 generateText(true) 来获取纯文本版本
             let text = generateText(true);
             navigator.clipboard.writeText(text).then(() => {
-                alert('Text copied, now redirecting to WhatsApp');
-                let whatsappURL = `https://wa.me/?text=${encodeURIComponent(text)}`;
-                window.location.href = whatsappURL;
+                // 显示成功提示
+                alert('订单列表已复制到剪贴板！正在打开WhatsApp群组...');
+                
+                // 直接打开指定的WhatsApp群组
+                const whatsappGroupURL = 'https://chat.whatsapp.com/FwwLA8M62mPK1N1jZj6BJw';
+                window.open(whatsappGroupURL, '_blank');
             }).catch(err => {
-                console.error('无法复制', err);
+                console.error('无法复制到剪贴板', err);
+                // 如果复制失败，仍然打开群组，但提示用户手动复制
+                alert('复制失败，请手动复制订单内容。正在打开WhatsApp群组...');
+                const whatsappGroupURL = 'https://chat.whatsapp.com/FwwLA8M62mPK1N1jZj6BJw';
+                window.open(whatsappGroupURL, '_blank');
             });
         }
 
@@ -4135,7 +4167,7 @@
         });
     </script>
 
-    <p class="contact-info">🌟If you have any questions or suggestion please contact me (Mark).<br>🌟Stock quantity now will auto update from stock system!.</p>
+    <p class="contact-info">🌟If you have any questions or suggestion please contact me (Mark).<br>🌟Stock quantity now will auto update</p>
  
     <!-- PWA更新提示 -->
     <div id="update-notification" style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); color: white; padding: 15px 20px; border-radius: 10px; box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37); z-index: 9999;">
@@ -4146,7 +4178,7 @@
     <script>
         // PWA Service Worker 注册
         if ('serviceWorker' in navigator) {
-            let refreshing = false;
+            let refreshing = false
             let updateNotificationShown = false;
 
             window.addEventListener('load', function() {
