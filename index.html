@@ -3384,20 +3384,145 @@
         function copyAndSendWhatsApp() {
             // 使用 generateText(true) 来获取纯文本版本
             let text = generateText(true);
+            
+            // 复制到剪贴板
             navigator.clipboard.writeText(text).then(() => {
-                // 显示成功提示
-                alert('订单列表已复制到剪贴板！正在打开WhatsApp群组...');
+                // 显示成功提示和操作指南
+                showWhatsAppInstructions();
                 
-                // 直接打开指定的WhatsApp群组
-                const whatsappGroupURL = 'https://chat.whatsapp.com/FwwLA8M62mPK1N1jZj6BJw';
-                window.open(whatsappGroupURL, '_blank');
+                // 延迟1秒后打开群组，给用户时间看到提示
+                setTimeout(() => {
+                    const directGroupURL = 'https://chat.whatsapp.com/FwwLA8M62mPK1N1jZj6BJw';
+                    const whatsappWindow = window.open(directGroupURL, '_blank');
+                    
+                    // 监听窗口焦点变化，提供额外的粘贴提示
+                    setupWhatsAppPasteReminder(whatsappWindow);
+                }, 1000);
+                
             }).catch(err => {
                 console.error('无法复制到剪贴板', err);
-                // 如果复制失败，仍然打开群组，但提示用户手动复制
-                alert('复制失败，请手动复制订单内容。正在打开WhatsApp群组...');
-                const whatsappGroupURL = 'https://chat.whatsapp.com/FwwLA8M62mPK1N1jZj6BJw';
-                window.open(whatsappGroupURL, '_blank');
+                alert('复制失败，请手动复制订单内容后再打开群组');
             });
+        }
+
+        function setupWhatsAppPasteReminder(whatsappWindow) {
+            // 创建一个浮动提示，提醒用户粘贴
+            const reminder = document.createElement('div');
+            reminder.id = 'whatsapp-paste-reminder';
+            reminder.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #25D366;
+                color: white;
+                padding: 15px 20px;
+                border-radius: 10px;
+                box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+                z-index: 9999;
+                font-family: Arial, sans-serif;
+                font-size: 14px;
+                max-width: 300px;
+                animation: slideIn 0.3s ease-out;
+                cursor: pointer;
+            `;
+            
+            reminder.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 20px;">📱</span>
+                    <div>
+                        <div style="font-weight: bold;">WhatsApp群组已打开</div>
+                        <div style="font-size: 12px; opacity: 0.9;">点击此处或按 Ctrl+V 粘贴订单</div>
+                    </div>
+                    <span onclick="this.parentElement.parentElement.remove()" 
+                          style="font-size: 18px; cursor: pointer; opacity: 0.7;">×</span>
+                </div>
+            `;
+            
+            // 点击提示框时尝试聚焦到WhatsApp窗口
+            reminder.onclick = function() {
+                if (whatsappWindow && !whatsappWindow.closed) {
+                    whatsappWindow.focus();
+                }
+                this.remove();
+            };
+            
+            document.body.appendChild(reminder);
+            
+            // 添加CSS动画
+            if (!document.getElementById('whatsapp-reminder-styles')) {
+                const style = document.createElement('style');
+                style.id = 'whatsapp-reminder-styles';
+                style.textContent = `
+                    @keyframes slideIn {
+                        from { transform: translateX(100%); opacity: 0; }
+                        to { transform: translateX(0); opacity: 1; }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            // 10秒后自动移除提示
+            setTimeout(() => {
+                if (reminder.parentNode) {
+                    reminder.style.animation = 'slideIn 0.3s ease-out reverse';
+                    setTimeout(() => reminder.remove(), 300);
+                }
+            }, 10000);
+        }
+
+        function showWhatsAppInstructions() {
+            // 创建一个美观的提示框
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.8);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 10000;
+                font-family: Arial, sans-serif;
+            `;
+            
+            const content = document.createElement('div');
+            content.style.cssText = `
+                background: white;
+                padding: 30px;
+                border-radius: 15px;
+                text-align: center;
+                max-width: 400px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            `;
+            
+            content.innerHTML = `
+                <div style="color: #25D366; font-size: 48px; margin-bottom: 20px;">✅</div>
+                <h2 style="color: #333; margin-bottom: 20px;">订单已复制成功！</h2>
+                <p style="color: #666; line-height: 1.6; margin-bottom: 25px;">
+                    订单内容已复制到剪贴板<br>
+                    WhatsApp群组即将打开<br>
+                    <strong style="color: #25D366;">请在群组中按 Ctrl+V (或 Cmd+V) 粘贴订单</strong>
+                </p>
+                <div style="display: flex; gap: 10px; justify-content: center;">
+                    <button onclick="this.parentElement.parentElement.parentElement.remove()" 
+                            style="background: #25D366; color: white; border: none; padding: 12px 24px; 
+                                   border-radius: 8px; cursor: pointer; font-size: 16px;">
+                        我知道了
+                    </button>
+                </div>
+            `;
+            
+            modal.appendChild(content);
+            document.body.appendChild(modal);
+            
+            // 3秒后自动关闭提示框
+            setTimeout(() => {
+                if (modal.parentNode) {
+                    modal.remove();
+                }
+            }, 3000);
         }
 
         function searchProduct() {
