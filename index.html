@@ -137,7 +137,7 @@
         /* Shop Grid System */
         .shop-container {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(2, 1fr) !important; /* 强制一行两个 */
             gap: 12px;
             margin-bottom: 24px;
         }
@@ -587,14 +587,14 @@
 
         /* Responsive Tweaks */
         @media (max-width: 380px) {
-            .shop-container { grid-template-columns: 1fr; }
             .category-container { grid-template-columns: repeat(3, 1fr); }
+            /* 移除了 .shop-container 的单列设置，保持所有屏幕双列 */
         }
     </style>
 </head>
 <body class="dark-mode"> <!-- Default to Dark Mode -->
 
-    <!-- 公告横幅 (保持原有逻辑) -->
+    <!-- 公告横幅 (修复文字显示) -->
     <div id="announcementBanner" style="
         position: fixed; top: 0; left: 0; right: 0;
         background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffd93d);
@@ -603,7 +603,12 @@
         color: white; font-weight: bold; font-size: 14px; padding: 10px 0;
         z-index: 10000; overflow: hidden; white-space: nowrap; display: none;
         border-bottom: 1px solid rgba(255,255,255,0.2);">
-        <div id="announcementScrollText" style="display: inline-block; padding-left: 100%; animation: scroll 15s linear infinite; line-height: 1.2;"></div>
+        <div id="announcementScrollText" style="
+            display: inline-block; 
+            padding-left: 100%; 
+            animation: scroll 15s linear infinite; 
+            line-height: 1.2;
+            white-space: nowrap;"></div>
     </div>
 
     <!-- 认证容器 -->
@@ -1659,12 +1664,54 @@
                     const data = snap.val();
                     if(data) {
                         Object.values(data).forEach(item => {
+                            // Update Stock
                             stockMap[item.name] = Math.max(stockMap[item.name] || 0, item.quantity);
+                            
+                            // Update Image if exists (Restored Functionality)
+                            if (item.imageUrl) {
+                                // Find product by name in our local data
+                                Object.values(window.allProducts).forEach(product => {
+                                    if (product.name === item.name) {
+                                        product.imageUrl = item.imageUrl;
+                                        updateProductImageInDOM(product.id, item.imageUrl);
+                                    }
+                                });
+                            }
                         });
                         updateStockDisplay();
                     }
                 });
             });
+        }
+
+        // Helper to update image in DOM without full reload
+        function updateProductImageInDOM(id, url) {
+            // Handle Grid View
+            if (currentView === 'grid') {
+                const productCard = document.querySelector(`div[data-product-id="${id}"]`);
+                if (productCard) {
+                    const imgContainer = productCard.querySelector('.product-image');
+                    if (imgContainer && !imgContainer.querySelector('img')) {
+                         imgContainer.innerHTML = `<img src="${url}" alt="Product" style="width:100%; height:100%; object-fit:cover;" onclick="showImage('${url}', ''); event.stopPropagation();">`;
+                         // Add onclick to parent to handle click if needed
+                         imgContainer.setAttribute('onclick', `showImage('${url}', ''); event.stopPropagation();`);
+                    }
+                }
+            } 
+            // Handle List View
+            else {
+                const label = document.querySelector(`label[for="item${id}"]`);
+                if (label) {
+                    const container = label.querySelector('div'); // The flex container inside label
+                    if (container && !container.querySelector('.view-image-btn')) {
+                         const btn = document.createElement('button');
+                         btn.className = 'view-image-btn';
+                         btn.innerHTML = '<span class="material-icons-outlined" style="font-size: 14px; margin-right: 2px;">image</span> View';
+                         btn.onclick = (e) => { showImage(url, ''); e.stopPropagation(); };
+                         container.appendChild(btn);
+                    }
+                }
+            }
         }
 
         function updateProductBoxDisplay() {
@@ -1704,6 +1751,7 @@
         }
 
         function saveItem(id, name) {
+            vibrate(); // Added vibration
             const checkbox = document.getElementById('item' + id);
             const qtyInput = document.getElementById('quantity' + id);
             if (checkbox.checked) {
@@ -1862,17 +1910,23 @@
                 const data = snap.val();
                 const banner = document.getElementById('announcementBanner');
                 const textEl = document.getElementById('announcementScrollText');
+                
                 if(data && data.enabled) {
-                    const now = Date.now();
-                    if(now >= data.startTime && now <= data.endTime) {
+                    // Simply show if enabled
+                    // Ensure text is set
+                    if(data.text) {
+                        textEl.textContent = data.text; // Fix: ensure text is assigned
                         banner.style.display = 'block';
-                        banner.style.background = data.background && data.background.color ? data.background.color : 'linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1)';
-                        banner.style.fontSize = data.fontSize || '16px';
+                        
+                        // Apply styles
+                        banner.style.background = data.background && data.background.color ? data.background.color : 
+                            (data.background && data.background.type === 'custom' ? 
+                            `linear-gradient(45deg, ${data.background.startColor}, ${data.background.endColor})` : 
+                            'linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1)');
+                            
+                        banner.style.fontSize = data.fontSize || '14px';
                         banner.style.color = data.textColor || 'white';
-                        textEl.textContent = data.text;
                         textEl.style.animationDuration = data.speed || '15s';
-                    } else {
-                        banner.style.display = 'none';
                     }
                 } else {
                     banner.style.display = 'none';
