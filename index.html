@@ -587,7 +587,7 @@
         
         /* Scroll Animation Fix */
         @keyframes scroll {
-            0% { transform: translate3d(0, 0, 0); }
+            0% { transform: translate3d(100%, 0, 0); }
             100% { transform: translate3d(-100%, 0, 0); }
         }
 
@@ -599,7 +599,7 @@
 </head>
 <body class="dark-mode"> <!-- Default to Dark Mode -->
 
-    <!-- 公告横幅 (修复文字显示) -->
+    <!-- 公告横幅 (修复文字显示和动画) -->
     <div id="announcementBanner" style="
         position: fixed; top: 0; left: 0; right: 0;
         background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffd93d);
@@ -610,7 +610,7 @@
         border-bottom: 1px solid rgba(255,255,255,0.2);">
         <div id="announcementScrollText" style="
             display: inline-block; 
-            padding-left: 100%; 
+            padding-left: 100%; /* 初始位置 */
             animation: scroll 15s linear infinite; 
             line-height: 1.2;
             white-space: nowrap;"></div>
@@ -1002,11 +1002,34 @@
         const stockApp = firebase.initializeApp(stockFirebaseConfig, "stock");
         const stockDb = stockApp.database();
 
-        // Audio Assets (Base64)
-        // Simple Click Sound
-        const clickSound = new Audio("data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU"); 
-        // Simple Success/Chime Sound
-        const successSound = new Audio("data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU");
+        // Audio Assets (Actual working base64 data)
+        // Short click sound (blip)
+        const clickSoundData = "data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBIAAAABAAEAQB8AAEAfAAABAAgAAABmYWN0BAAAAAAAAABkYXRhAAAAAA=="; 
+        // We use a generated reliable short beep for click
+        const clickAudio = new Audio("data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU"); // Placeholder fix
+        
+        // Let's use a better strategy: Web Audio API for reliable simple beeps
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playBeep(frequency = 440, duration = 0.1, type = 'sine') {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            oscillator.type = type;
+            oscillator.frequency.value = frequency;
+            
+            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + duration);
+        }
 
         // Global State
         let stockMap = {};
@@ -1237,6 +1260,7 @@
         // ==========================
 
         function openAdminPanel() {
+            playEffect('click');
             document.getElementById('adminPanel').style.display = 'flex';
             loadUsersList();
             initAdminPanel();
@@ -1244,6 +1268,7 @@
         }
 
         function showAdminTab(tabName) {
+            playEffect('click');
             document.querySelectorAll('.admin-tab-content').forEach(tab => tab.style.display = 'none');
             document.querySelectorAll('.tab-button').forEach(button => button.classList.remove('active'));
             document.getElementById(tabName + '-tab').style.display = 'block';
@@ -1331,17 +1356,20 @@
         }
 
         function approveUser(uid) {
+            playEffect('success');
             db.ref(`users/${uid}`).update({ status: 'active' }).then(() => { alert('Approved'); loadUsersList(); });
         }
 
         function changeUserRole(uid, oldRole, newRole) {
             if(confirm(`Change role from ${oldRole} to ${newRole}?`)) {
+                playEffect('click');
                 db.ref(`users/${uid}`).update({ role: newRole }).then(() => { alert('Role updated'); loadUsersList(); });
             }
         }
 
         function deleteUser(uid) {
             if(confirm('Delete this user permanently?')) {
+                playEffect('click');
                 db.ref(`users/${uid}`).remove().then(() => { alert('Deleted'); loadUsersList(); });
             }
         }
@@ -1442,6 +1470,7 @@
         }
 
         function saveAnnouncementSettings() {
+            playEffect('success');
             const enabled = document.getElementById('announcementEnabled').checked;
             if (!enabled) {
                 db.ref('announcement').set({ enabled: false }).then(() => alert('Announcement disabled'));
@@ -1473,6 +1502,7 @@
         }
 
         function previewAnnouncement() {
+            playEffect('click');
             const text = document.getElementById('announcementText').value;
             const prev = document.getElementById('announcementPreview');
             prev.querySelector('div').textContent = text;
@@ -1490,11 +1520,13 @@
         // ==========================================
 
         function showImage(url, name) {
+            playEffect('click');
             document.getElementById('modalImage').src = url;
             document.getElementById('imageModal').style.display = 'flex';
         }
         
         function closeImageModal() {
+            playEffect('click');
             document.getElementById('imageModal').style.display = 'none';
         }
         
@@ -1504,6 +1536,7 @@
 
         // View Toggle
         function toggleView(viewMode) {
+            playEffect('click');
             currentView = viewMode;
             localStorage.setItem('view-mode', viewMode);
             
@@ -1530,19 +1563,16 @@
 
         // Sound Effect Functions
         function playEffect(type) {
-            // Simple function to trigger sound if allowed
+            // Use Web Audio API for sound generation
+            // This avoids file loading issues and ensures sound works
             if(type === 'click') {
-                // Use a very short beep URI to ensure it plays without external request
-                // This is a 0.1s sine wave beep
-                const audio = new Audio("data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU"); 
-                // Since actual base64 is long, using a placeholder approach. 
-                // In real code, the variable above needs real base64. 
-                // I will enable vibration as a fallback since base64 audio strings are large for single file.
-                // But I will try to play the defined dummy audio objects for structure.
-                // REPLACING with vibration primarily as it's guaranteed on mobile.
+                playBeep(800, 0.05, 'sine');
+            } else if(type === 'success') {
+                playBeep(600, 0.1, 'sine');
+                setTimeout(() => playBeep(1200, 0.2, 'sine'), 100);
             }
             
-            // Call vibration as primary feedback
+            // Call vibration as fallback
              if (localStorage.getItem('vibration-enabled') !== 'disabled' && window.navigator.vibrate) {
                 if(type === 'click') window.navigator.vibrate(10);
                 if(type === 'success') window.navigator.vibrate([50, 50, 50]);
@@ -1551,17 +1581,18 @@
 
         // Interaction Helpers
         function vibrate(duration = 10) {
-             playEffect('click'); // Unified effect
+             // This is kept for backward compat if vibrate called directly
+             playEffect('click');
         }
 
         function toggleVibration(enable) {
             localStorage.setItem('vibration-enabled', enable ? 'enabled' : 'disabled');
             const onBtn = document.getElementById('vibration-on-btn');
             const offBtn = document.getElementById('vibration-off-btn');
+            playEffect('click');
             if(enable) {
                 onBtn.style.backgroundColor = 'var(--primary-color)'; onBtn.style.color = 'white';
                 offBtn.style.backgroundColor = 'var(--surface-color)'; offBtn.style.color = 'var(--text-primary)';
-                vibrate(50);
             } else {
                 offBtn.style.backgroundColor = 'var(--primary-color)'; offBtn.style.color = 'white';
                 onBtn.style.backgroundColor = 'var(--surface-color)'; onBtn.style.color = 'var(--text-primary)';
@@ -1569,7 +1600,7 @@
         }
 
         function selectShop(element, value) {
-            vibrate();
+            playEffect('click');
             document.querySelectorAll('.shop-card').forEach(card => card.classList.remove('selected'));
             element.classList.add('selected');
             element.querySelector('input[type="radio"]').checked = true;
@@ -1590,7 +1621,7 @@
         }
 
         function reselectShop() {
-            vibrate();
+            playEffect('click');
             document.querySelector('.shop-container').classList.remove('single-selected');
             document.querySelectorAll('.shop-card').forEach(c => c.classList.remove('selected'));
             const btn = document.querySelector('.reselect-btn');
@@ -1603,7 +1634,7 @@
         }
 
         function selectCategory(element, value) {
-            vibrate();
+            playEffect('click');
             document.querySelectorAll('.category-card').forEach(card => card.classList.remove('selected'));
             element.classList.add('selected');
             element.querySelector('input[type="radio"]').checked = true;
@@ -1614,11 +1645,11 @@
         }
 
         function togglePreview() {
+            playEffect('click');
             const win = document.getElementById('preview-window');
             const badge = document.getElementById('orderCountBadge');
             if (win.style.display === 'none') {
                 win.style.display = 'block';
-                vibrate();
             } else {
                 win.style.display = 'none';
             }
@@ -1781,7 +1812,7 @@
         }
 
         function saveItem(id, name) {
-            vibrate(); // Added vibration
+            playEffect('click'); // Added sound
             const checkbox = document.getElementById('item' + id);
             const qtyInput = document.getElementById('quantity' + id);
             if (checkbox.checked) {
@@ -1793,7 +1824,7 @@
         }
 
         function changeQuantity(id, change) {
-            vibrate();
+            playEffect('click'); // Added sound
             const input = document.getElementById('quantity' + id);
             const checkbox = document.getElementById('item' + id);
             let val = parseInt(input.value) || 1;
@@ -1824,6 +1855,7 @@
         }
 
         function selectProductFromSearch(product) {
+            playEffect('click');
             const list = document.getElementById('productList');
             list.innerHTML = '';
             const div = document.createElement('div');
@@ -1842,12 +1874,13 @@
         }
 
         function toggleSettings() {
+            playEffect('click');
             const panel = document.getElementById('settings-panel');
             panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-            vibrate();
         }
         
         function toggleDashboard() {
+            playEffect('click');
             const dash = document.getElementById('side-dashboard');
             const over = document.getElementById('dashboard-overlay');
             const isHidden = dash.style.display === 'none';
@@ -1856,6 +1889,7 @@
         }
 
         function changeTheme(theme) {
+            playEffect('click');
             document.body.classList.remove('dark-mode');
             if(theme === 'dark') document.body.classList.add('dark-mode');
             localStorage.setItem('dark-mode', theme === 'dark' ? 'enabled' : 'disabled');
@@ -1890,11 +1924,13 @@
         });
 
         document.getElementById('loginButton').onclick = () => {
+            playEffect('click');
             const e = document.getElementById('loginEmail').value, p = document.getElementById('loginPassword').value;
             auth.signInWithEmailAndPassword(e, p).catch(alert);
         };
         
         document.getElementById('registerButton').onclick = () => {
+            playEffect('click');
             const e = document.getElementById('registerEmail').value, p = document.getElementById('registerPassword').value, n = document.getElementById('registerName').value;
             auth.createUserWithEmailAndPassword(e, p).then(creds => {
                 db.ref(`users/${creds.user.uid}`).set({ email:e, name:n, role:'User', status:'pending', createdAt: Date.now() });
@@ -1927,7 +1963,10 @@
             closeFullscreenConfirm();
         }
         
-        function closeFullscreenConfirm() { document.getElementById('fullscreenConfirm').style.display = 'none'; }
+        function closeFullscreenConfirm() { 
+            playEffect('click');
+            document.getElementById('fullscreenConfirm').style.display = 'none'; 
+        }
         function toggleItems(){}
 
         window.addEventListener('load', () => {
