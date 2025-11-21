@@ -147,7 +147,7 @@
             background: var(--surface-color);
             border-radius: var(--radius-lg);
             overflow: hidden;
-            aspect-ratio: 16/9;
+            aspect-ratio: ;
             box-shadow: var(--shadow-sm);
             border: 1px solid var(--border-color);
             transition: all 0.3s ease;
@@ -194,7 +194,7 @@
         }
         
         .shop-container.single-selected .shop-card:not(.selected) { display: none; }
-        .shop-container.single-selected .shop-card.selected { width: 100%; max-width: 350px; aspect-ratio: 2/1; }
+        .shop-container.single-selected .shop-card.selected { width: 100%; max-width: 450px; aspect-ratio: 3/2; }
 
         .reselect-btn {
             margin-top: 12px;
@@ -541,6 +541,7 @@
 
         .auth-box h2 { color: var(--primary-color); margin-bottom: 24px; }
         .auth-form button { width: 100%; padding: 14px; border-radius: var(--radius-lg); background: var(--primary-color); color: white; font-size: 1rem; margin-top: 10px; }
+        .auth-form button:disabled { opacity: 0.7; cursor: not-allowed; }
         .auth-form .switch-form { color: var(--text-secondary); margin-top: 20px; font-size: 0.9rem; }
 
         /* Admin Panel Styles */
@@ -587,8 +588,8 @@
         
         /* Scroll Animation Fix */
         @keyframes scroll {
-            0% { transform: translate3d(100%, 0, 0); }
-            100% { transform: translate3d(-100%, 0, 0); }
+            0% { transform: translate3d(100vw, 0, 0); } /* Start from right of screen */
+            100% { transform: translate3d(-100%, 0, 0); } /* End at left of text width */
         }
 
         /* Responsive Tweaks */
@@ -610,7 +611,6 @@
         border-bottom: 1px solid rgba(255,255,255,0.2);">
         <div id="announcementScrollText" style="
             display: inline-block; 
-            padding-left: 100%; /* 初始位置 */
             animation: scroll 15s linear infinite; 
             line-height: 1.2;
             white-space: nowrap;"></div>
@@ -1002,33 +1002,62 @@
         const stockApp = firebase.initializeApp(stockFirebaseConfig, "stock");
         const stockDb = stockApp.database();
 
-        // Audio Assets (Actual working base64 data)
-        // Short click sound (blip)
-        const clickSoundData = "data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBIAAAABAAEAQB8AAEAfAAABAAgAAABmYWN0BAAAAAAAAABkYXRhAAAAAA=="; 
-        // We use a generated reliable short beep for click
-        const clickAudio = new Audio("data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU"); // Placeholder fix
-        
-        // Let's use a better strategy: Web Audio API for reliable simple beeps
+        // Advanced Sound Effect System using Web Audio API
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        
-        function playBeep(frequency = 440, duration = 0.1, type = 'sine') {
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
+
+        function playEffect(type) {
+            try {
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                
+                const gainNode = audioCtx.createGain();
+                gainNode.connect(audioCtx.destination);
+
+                if (type === 'add') {
+                    // High pitch short beep (Increase)
+                    playTone(880, 0.1, 'sine');
+                } else if (type === 'remove') {
+                    // Low pitch short beep (Decrease)
+                    playTone(440, 0.1, 'sine');
+                } else if (type === 'select') {
+                    // Soft pop (Selection)
+                    playTone(600, 0.05, 'triangle');
+                } else if (type === 'success') {
+                    // Success chime (WhatsApp)
+                    playTone(523.25, 0.1, 'sine'); // C5
+                    setTimeout(() => playTone(659.25, 0.2, 'sine'), 100); // E5
+                } else {
+                    // Default click
+                    playTone(800, 0.03, 'sine');
+                }
+                
+                // Trigger vibration as backup
+                if (localStorage.getItem('vibration-enabled') !== 'disabled' && window.navigator.vibrate) {
+                    window.navigator.vibrate(10);
+                }
+            } catch(e) {
+                console.error("Audio play failed", e);
             }
-            const oscillator = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
-            
-            oscillator.type = type;
-            oscillator.frequency.value = frequency;
-            
-            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-            
-            oscillator.start();
-            oscillator.stop(audioCtx.currentTime + duration);
+        }
+
+        function playTone(freq, duration, type) {
+            try {
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                
+                oscillator.type = type;
+                oscillator.frequency.value = freq;
+                
+                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                
+                oscillator.start();
+                oscillator.stop(audioCtx.currentTime + duration);
+            } catch(e) {}
         }
 
         // Global State
@@ -1144,7 +1173,9 @@
                 { id: 903, name: "Dried mango", unit: 'ctn' }, { id: 904, name: "Coconut milk candy", unit: 'ctn' },
                 { id: 905, name: "Durian milk candy", unit: 'ctn' }, { id: 906, name: "Bird Nest Candy", unit: 'ctn' },
                 { id: 907, name: "Traditional Coconut Candy", unit: 'ctn' }, { id: 908, name: "Kuih Cincin Mini (office)", unit: 'ctn' },
-                { id: 909, name: "Kuih Cincin Besar (office)", unit: 'ctn' }
+                
+                { id: 909, name: "Kuih Cincin Besar (office)", unit: 'ctn' },
+                { id: 910, name: "Kerepek Pisang Manis", unit: 'ctn' },{ id: 911, name: "Kerepek Pisang Masin", unit: 'ctn' }
             ]
         };
 
@@ -1561,24 +1592,6 @@
             vibrate();
         }
 
-        // Sound Effect Functions
-        function playEffect(type) {
-            // Use Web Audio API for sound generation
-            // This avoids file loading issues and ensures sound works
-            if(type === 'click') {
-                playBeep(800, 0.05, 'sine');
-            } else if(type === 'success') {
-                playBeep(600, 0.1, 'sine');
-                setTimeout(() => playBeep(1200, 0.2, 'sine'), 100);
-            }
-            
-            // Call vibration as fallback
-             if (localStorage.getItem('vibration-enabled') !== 'disabled' && window.navigator.vibrate) {
-                if(type === 'click') window.navigator.vibrate(10);
-                if(type === 'success') window.navigator.vibrate([50, 50, 50]);
-            }
-        }
-
         // Interaction Helpers
         function vibrate(duration = 10) {
              // This is kept for backward compat if vibrate called directly
@@ -1600,7 +1613,7 @@
         }
 
         function selectShop(element, value) {
-            playEffect('click');
+            playEffect('select');
             document.querySelectorAll('.shop-card').forEach(card => card.classList.remove('selected'));
             element.classList.add('selected');
             element.querySelector('input[type="radio"]').checked = true;
@@ -1634,7 +1647,7 @@
         }
 
         function selectCategory(element, value) {
-            playEffect('click');
+            playEffect('select');
             document.querySelectorAll('.category-card').forEach(card => card.classList.remove('selected'));
             element.classList.add('selected');
             element.querySelector('input[type="radio"]').checked = true;
@@ -1670,55 +1683,101 @@
             content.innerHTML = text.replace(/\n/g, '<br>');
         }
 
-        function generateText(forWhatsApp) {
-            let result = '';
-            let selectedStore = document.querySelector('input[name="store"]:checked');
-            let hasAddOn = document.getElementById('addOnCheckbox').checked;
-            let totalItems = 0;
-            let userName = currentUser ? (currentUser.email ? currentUser.email.split('@')[0] : "Guest") : "Guest";
-            try {
-                 const nameEl = document.querySelector('#dashboardUserName');
-                 if(nameEl && nameEl.textContent !== 'Not logged in') userName = nameEl.textContent;
-            } catch(e){}
+function generateText(forWhatsApp) {
+    let result = '';
+    let selectedStore = document.querySelector('input[name="store"]:checked');
+    let hasAddOn = document.getElementById('addOnCheckbox').checked;
+    let totalItems = 0;
+    
+    // 获取用户名
+    let userName = currentUser ? (currentUser.email ? currentUser.email.split('@')[0] : "Guest") : "Guest";
+    try {
+         const nameEl = document.querySelector('#dashboardUserName');
+         if(nameEl && nameEl.textContent !== 'Not logged in') userName = nameEl.textContent;
+    } catch(e){}
 
-            if (selectedStore) {
-                result += 'Store: ' + selectedStore.value + (hasAddOn ? ' 💥Add On💥' : '') + '\n';
-                result += 'Order By: (' + userName + ')\n\n';
+    // --- 新增：日期和时间逻辑 ---
+    const now = new Date();
+    const day = String(now.getDate()).padStart(2, '0');
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const year = now.getFullYear();
+    const dateStr = `${day}/${month}/${year}`;
+
+    let hours = now.getHours();
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const ampm = hours >= 12 ? 'pm' : 'am';
+    hours = hours % 12;
+    hours = hours ? hours : 12; // 0点显示为12点
+    const timeStr = `${String(hours).padStart(2, '0')}:${minutes}${ampm}`;
+    // ---------------------------
+
+    // 构建头部信息
+    if (selectedStore) {
+        // 去除value中可能自带的星号，防止重复
+        let storeName = selectedStore.value.replace(/\*/g, '');
+        
+        result += `🏪 *${storeName}* ${hasAddOn ? '💥(ADD ON)' : ''}\n`;
+        result += `👤 Order By: ${userName}\n`;
+        result += `📅 Date: ${dateStr}\n`;
+        result += `🕠 Time: ${timeStr}\n\n`;
+    }
+
+    // 处理商品分类和计数
+    const categorizedItems = {};
+    Object.keys(categories).forEach(c => categorizedItems[c] = []);
+
+    for (const [id, quantity] of Object.entries(selectedItems)) {
+        for (const [cat, products] of Object.entries(categories)) {
+            const p = products.find(i => i.id == id);
+            if (p) {
+                categorizedItems[cat].push({ ...p, quantity });
+                // 巧克力按品种算1个，其他按数量算（保留你之前的逻辑）
+                if(p.name.includes("Chocolate")) totalItems += 1; 
+                else totalItems += parseInt(quantity);
+                break;
             }
-
-            const categorizedItems = {};
-            Object.keys(categories).forEach(c => categorizedItems[c] = []);
-
-            for (const [id, quantity] of Object.entries(selectedItems)) {
-                for (const [cat, products] of Object.entries(categories)) {
-                    const p = products.find(i => i.id == id);
-                    if (p) {
-                        categorizedItems[cat].push({ ...p, quantity });
-                        if(p.name.includes("Chocolate")) totalItems += 1; else totalItems += parseInt(quantity);
-                        break;
-                    }
-                }
-            }
-
-            result += `📦 Total Items: ${totalItems}\n`;
-
-            for (const [cat, items] of Object.entries(categorizedItems)) {
-                if (items.length > 0) {
-                    result += `\n🔹 ${cat} 🔹\n`;
-                    items.forEach(item => {
-                        if (forWhatsApp) {
-                            result += `${item.name} - ${item.quantity}\n`;
-                        } else {
-                            const stock = stockMap[item.name] || 0;
-                            const nameHtml = stock === 0 ? `<span style="color:var(--danger-color)">${item.name}</span>` : item.name;
-                            result += `${nameHtml} - <b>${item.quantity}</b>\n`;
-                        }
-                    });
-                }
-            }
-            return result;
         }
+    }
 
+    result += `📦 Total Items: *${totalItems}*\n`;
+
+    // 定义分类对应的 Emoji (优化点)
+    const categoryIcons = {
+        'BanHeang': '🍪', 'HoeHup': '🥮', 'Chocolate': '🍫', 
+        'Sotong': '🦑', 'Coffee': '☕', 'Amplang': '🌕', 
+        'Other': '🎁', 'Wrapping': '🧸', 'Office': '📦'
+    };
+
+    // 构建商品列表
+    for (const [cat, items] of Object.entries(categorizedItems)) {
+        if (items.length > 0) {
+            // 获取对应图标，如果没有则不显示
+            const icon = categoryIcons[cat] || '';
+            
+            result += `\n🔹🔸🔹 ${cat} ${icon} 🔹🔸🔹\n`;
+            
+            items.forEach(item => {
+                const unit = item.unit || 'ctn'; // 默认单位 ctn
+                
+                if (forWhatsApp) {
+                    // WhatsApp 纯文本格式
+                    // 建议：可以在数量上加粗 (例如 *1 ctn*) 方便查看，这里暂时按照你的要求不加
+                    result += `${item.name} - ${item.quantity} ${unit}\n`;
+                } else {
+                    // 网页预览格式 (HTML)
+                    const stock = stockMap[item.name] || 0;
+                    // 如果无库存，红色显示名字
+                    const nameHtml = stock === 0 ? `<span style="color:var(--danger-color)">${item.name}</span>` : item.name;
+                    result += `${nameHtml} - <b>${item.quantity} ${unit}</b>\n`;
+                }
+            });
+        }
+    }
+    
+    result += '\n_App Version 2.0_';
+    
+    return result;
+}
         function loadQuantitiesFromFirebase() {
             ['office', 'kepayan'].forEach(loc => {
                 stockDb.ref(`inventory/${loc}`).on('value', snap => {
@@ -1812,7 +1871,7 @@
         }
 
         function saveItem(id, name) {
-            playEffect('click'); // Added sound
+            playEffect('select'); // Selection sound
             const checkbox = document.getElementById('item' + id);
             const qtyInput = document.getElementById('quantity' + id);
             if (checkbox.checked) {
@@ -1824,12 +1883,23 @@
         }
 
         function changeQuantity(id, change) {
-            playEffect('click'); // Added sound
             const input = document.getElementById('quantity' + id);
             const checkbox = document.getElementById('item' + id);
             let val = parseInt(input.value) || 1;
+            
+            // Play sound based on action
+            if (change > 0) {
+                playEffect('add');
+            } else if (val > 1) {
+                playEffect('remove');
+            } else {
+                // At minimum quantity
+                playEffect('remove');
+            }
+
             val = Math.max(1, val + change);
             input.value = val;
+            
             if (selectedItems[id] || checkbox.checked) {
                 checkbox.checked = true;
                 selectedItems[id] = val;
@@ -1855,7 +1925,7 @@
         }
 
         function selectProductFromSearch(product) {
-            playEffect('click');
+            playEffect('select');
             const list = document.getElementById('productList');
             list.innerHTML = '';
             const div = document.createElement('div');
@@ -1923,18 +1993,65 @@
             }
         });
 
+        // Robust Login Logic with Safety Checks
         document.getElementById('loginButton').onclick = () => {
-            playEffect('click');
-            const e = document.getElementById('loginEmail').value, p = document.getElementById('loginPassword').value;
-            auth.signInWithEmailAndPassword(e, p).catch(alert);
+            try { playEffect('click'); } catch(e) { console.error(e); }
+            
+            const emailField = document.getElementById('loginEmail');
+            const passField = document.getElementById('loginPassword');
+            
+            const e = emailField.value.trim(); 
+            const p = passField.value;
+            
+            if(!e || !p) {
+                alert("Please enter email and password");
+                return;
+            }
+
+            const btn = document.getElementById('loginButton');
+            const originalText = btn.innerText;
+            btn.innerText = "Logging in...";
+            btn.disabled = true;
+
+            auth.signInWithEmailAndPassword(e, p)
+                .then(() => {
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                })
+                .catch(error => {
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                    alert("Login Failed: " + error.message);
+                });
         };
         
+        // Robust Register Logic
         document.getElementById('registerButton').onclick = () => {
-            playEffect('click');
-            const e = document.getElementById('registerEmail').value, p = document.getElementById('registerPassword').value, n = document.getElementById('registerName').value;
+            try { playEffect('click'); } catch(e) {}
+            
+            const e = document.getElementById('registerEmail').value.trim();
+            const p = document.getElementById('registerPassword').value;
+            const n = document.getElementById('registerName').value.trim();
+            
+            if(!e || !p || !n) { alert("Please fill all fields"); return; }
+
+            const btn = document.getElementById('registerButton');
+            const originalText = btn.innerText;
+            btn.innerText = "Creating Account...";
+            btn.disabled = true;
+
             auth.createUserWithEmailAndPassword(e, p).then(creds => {
-                db.ref(`users/${creds.user.uid}`).set({ email:e, name:n, role:'User', status:'pending', createdAt: Date.now() });
-            }).catch(alert);
+                db.ref(`users/${creds.user.uid}`).set({ email:e, name:n, role:'User', status:'pending', createdAt: Date.now() })
+                .then(() => {
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                    // onAuthStateChanged handles the rest
+                });
+            }).catch(error => {
+                btn.innerText = originalText;
+                btn.disabled = false;
+                alert("Registration Failed: " + error.message);
+            });
         };
 
         function switchToRegister() {
