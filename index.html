@@ -1148,6 +1148,8 @@
 
             // Tree Group
             treeGroup = new THREE.Group();
+            // MOVE TREE DOWN to fit better
+            treeGroup.position.y = -2.0;
             scene.add(treeGroup);
 
             // --- Construct Tree ---
@@ -1158,26 +1160,56 @@
             trunk.position.y = 1;
             treeGroup.add(trunk);
 
-            // Leaves (3 Stacked Cones)
-            const leafMat = new THREE.MeshStandardMaterial({ color: 0x2d5a27, roughness: 0.8, metalness: 0.1 });
+            // Leaves Material (Low Poly Style)
+            const leafMat = new THREE.MeshStandardMaterial({ 
+                color: 0x2d5a27, 
+                roughness: 0.8, 
+                metalness: 0.1,
+                flatShading: true // Shows facets
+            });
             
-            const bottomCone = new THREE.Mesh(new THREE.ConeGeometry(3.5, 4, 32), leafMat);
-            bottomCone.position.y = 3.5;
+            // Wireframe Material for "Lines/Pattern" (纹路)
+            const wireMat = new THREE.MeshBasicMaterial({ 
+                color: 0x4fa045, 
+                wireframe: true, 
+                transparent: true, 
+                opacity: 0.3 
+            });
+
+            function createLayer(radius, height, y) {
+                // Use lower segments for "Low Poly" look
+                const geometry = new THREE.ConeGeometry(radius, height, 16);
+                const mesh = new THREE.Mesh(geometry, leafMat);
+                mesh.position.y = y;
+                
+                // Add Wireframe Overlay to show rotation
+                const wireMesh = new THREE.Mesh(geometry, wireMat);
+                wireMesh.scale.set(1.01, 1.01, 1.01); // Slightly bigger to prevent z-fighting
+                mesh.add(wireMesh);
+
+                return mesh;
+            }
+            
+            const bottomCone = createLayer(3.5, 4, 3.5);
             treeGroup.add(bottomCone);
 
-            const midCone = new THREE.Mesh(new THREE.ConeGeometry(2.8, 3.5, 32), leafMat);
-            midCone.position.y = 5.5;
+            const midCone = createLayer(2.8, 3.5, 5.5);
             treeGroup.add(midCone);
 
-            const topCone = new THREE.Mesh(new THREE.ConeGeometry(2, 3, 32), leafMat);
-            topCone.position.y = 7.5;
+            const topCone = createLayer(2, 3, 7.5);
             treeGroup.add(topCone);
             
-            // Star
-            const starGeo = new THREE.OctahedronGeometry(0.5, 0);
-            const starMat = new THREE.MeshStandardMaterial({ color: 0xffd700, emissive: 0xffaa00, emissiveIntensity: 0.5 });
+            // Star (More Prominent)
+            // IcosahedronGeometry looks more like a complex star/crystal
+            const starGeo = new THREE.IcosahedronGeometry(0.8, 0);
+            const starMat = new THREE.MeshStandardMaterial({ 
+                color: 0xffd700, 
+                emissive: 0xffd700, 
+                emissiveIntensity: 0.8,
+                flatShading: true
+            });
             const star = new THREE.Mesh(starGeo, starMat);
-            star.position.y = 9.2;
+            star.position.y = 9.5; // Adjusted position
             
             // Star Animation Helper
             star.userData = { type: 'star' };
@@ -1259,7 +1291,8 @@
                 });
                 
                 // Star spin
-                star.rotation.y += 0.01;
+                star.rotation.y -= 0.02;
+                star.rotation.z = Math.sin(time) * 0.1;
 
                 // Update HTML Labels
                 updateLabels();
@@ -1298,11 +1331,13 @@
                 mouse.y = -((clientY - rect.top) / rect.height) * 2 + 1;
 
                 raycaster.setFromCamera(mouse, camera);
-                const intersects = raycaster.intersectObjects(treeGroup.children);
+                const intersects = raycaster.intersectObjects(treeGroup.children, true); // recursive true
 
                 for (let i = 0; i < intersects.length; i++) {
-                    if (intersects[i].object.userData.isOrnament) {
-                        const shop = intersects[i].object.userData.shop;
+                    // Check direct object or parent (since we have wireframes inside)
+                    const obj = intersects[i].object;
+                    if (obj.userData.isOrnament) {
+                        const shop = obj.userData.shop;
                         selectShopFrom3D(shop.value, shop.name);
                         break;
                     }
