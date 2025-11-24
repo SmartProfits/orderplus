@@ -1,6 +1,29 @@
 <!DOCTYPE html>
 <html lang="zh">
+    
 <head>
+</head>
+<body style="height:100vh; margin:0;">
+  <audio id="bgMusic" src="https://raw.githubusercontent.com/SmartProfits/orderplus/main/pic/Taylor%20Swift%20-%20Last%20Christmas%20(Audio).mp3" loop muted></audio>
+
+  <script>
+    const audio = document.getElementById('bgMusic');
+
+    // 页面加载时准备播放
+    audio.play().catch(() => {
+      // 如果浏览器阻止播放，不做任何事，等待用户点击
+    });
+
+    // 点击页面任何地方解除静音并播放
+    function enableMusic() {
+      audio.muted = false; // 解除静音
+      audio.play();         // 播放音乐
+      document.removeEventListener('click', enableMusic); // 只触发一次
+    }
+
+    document.addEventListener('click', enableMusic);
+  </script>
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
     <meta charset="UTF-8" />
@@ -129,7 +152,7 @@
         }
         input:focus, select:focus, textarea:focus { border-color: var(--primary-color); }
 
-        /* --- 3D CANVAS CONTAINER --- */
+        /* --- 3D CANVAS CONTAINER & OPTIMIZED BUTTON --- */
         #canvas-wrapper {
             position: relative;
             width: 100%;
@@ -159,36 +182,53 @@
             letter-spacing: 1px;
             background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
             padding-bottom: 10px;
+            transition: all 0.3s ease;
         }
         
-        /* 3D Reset Button */
+        /* UPDATED: 3D Reset Button (Optimized Location & Style) */
         #reset-3d-btn {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
+            top: 2px;
+            left: 3px; /* Moved to Left (Standard Back position) */
+            right: auto;
+            background: rgba(0, 0, 0, 0.65); /* Darker glass for better contrast */
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            z-index: 20;
+            padding: 5px 10px;
+            border-radius: 50px;
+            z-index: 50;
             display: none; /* Hidden by default */
-            font-size: 0.9rem;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            font-size: 0.6rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            align-items: center;
+            gap: 8px;
+            animation: fadeInBtn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        #reset-3d-btn:hover {
+            background: rgba(211, 47, 47, 0.9); /* Red on hover */
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(211, 47, 47, 0.4);
+        }
+        
+        @keyframes fadeInBtn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* --- END 3D CSS --- */
 
-        .reselect-btn {
-            margin-top: 12px;
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            padding: 8px 20px;
-            border-radius: 20px;
-            font-size: 0.9rem;
+        .reselect-text-btn {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            text-decoration: underline;
+            font-size: 0.85rem;
+            padding: 0;
+            margin-left: 8px;
+            cursor: pointer;
         }
 
         /* Category Grid */
@@ -375,7 +415,7 @@
     <!-- SPLASH SCREEN -->
     <div id="splashScreen">
         <div class="splash-content">
-            <span class="material-icons-round splash-logo-icon">card_giftcard</span>
+            <span class="material-icons-round splash-logo-icon">forest</span>
             <h1 class="splash-title">Merry Christmas</h1>
             <div class="splash-subtitle" style="color:var(--success-color); margin-top:5px; opacity:0.9;">SmartProfits Stock</div>
             <div class="splash-loader"></div>
@@ -425,17 +465,18 @@
 
     <!-- Main Content -->
     <div id="mainAppContent" style="opacity: 0; transition: opacity 0.5s;">
-        <h1 style="padding-top: 20px; font-family: 'Georgia', serif;">🎄 Stock Request 🎄</h1>
+        <h1 style="padding-top: 20px; font-family: 'Georgia', serif;">🎄 Merry Christmas 🎄</h1>
 
         <!-- 3D SHOP SELECTOR -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0 10px;">
-            <h3><span class="material-icons-round" style="color: var(--primary-color)">store</span> Select Outlet (Touch to Select)</h3>
+            <h3 id="shopSelectHeader"><span class="material-icons-round" style="color: var(--primary-color)">store</span> Select Outlet</h3>
         </div>
 
-        <!-- Replaced the grid with the 3D Container -->
+        <!-- 3D Canvas Wrapper -->
         <div id="canvas-wrapper">
+            <!-- OPTIMIZED BUTTON POSITION: Top Left inside canvas -->
             <button id="reset-3d-btn" onclick="reset3DView()">
-                <span style="display:flex; align-items:center; gap:4px;"><i class="material-icons">refresh</i> Change Shop</span>
+                <span class="material-icons">arrow_back</span> Change Shop
             </button>
             <div id="canvas-container"></div>
             <div class="canvas-overlay-msg" id="canvas-msg">Tap a gift card to select shop</div>
@@ -453,7 +494,13 @@
             <input type="radio" name="store" value="*Wisma*" id="wisma">
         </div>
 
-        <h3 id="categoryTitle" style="display: none;"><span class="material-icons-round" style="color: var(--primary-color)">category</span> Category</h3>
+        <h3 id="categoryTitle" style="display: none;">
+            <div style="display:flex; align-items:center;">
+                <span class="material-icons-round" style="color: var(--primary-color); margin-right:6px;">category</span> 
+                Category 
+                <button class="reselect-text-btn" onclick="reset3DView()">(Change Shop)</button>
+            </div>
+        </h3>
         <div class="category-container" id="categoryContainer" style="display: none;">
             <div class="category-card" onclick="selectCategory(this, 'BanHeang')">
                 <input type="radio" name="category" value="BanHeang" id="banheang" style="display:none">
@@ -926,21 +973,18 @@
             // Visual Effect: Scale up mesh
             mesh.scale.set(1.3, 1.3, 1.3);
             
-            // Rotate tree so selected item faces camera approx
-            // Simplification: Just stop rotation for now
-            
             // Trigger App Logic
             const radio = document.querySelector(`input[value="${mesh.userData.value}"]`);
             if(radio) {
                 radio.checked = true;
-                // Call original logic via DOM element reference simulation
-                // Since original selectShop uses 'this', we need to mock it or rewrite logic slightly
-                // Easier: just execute logic directly here
                 
                 document.getElementById('categoryTitle').style.display = 'block';
                 document.getElementById('categoryContainer').style.display = 'grid';
                 document.getElementById('searchContainer').style.display = 'flex';
-                document.getElementById('reset-3d-btn').style.display = 'block'; // Show reset btn
+                
+                // Show Reset Button (with new animation)
+                document.getElementById('reset-3d-btn').style.display = 'flex'; 
+                
                 document.getElementById('canvas-msg').innerText = "Selected: " + mesh.userData.name;
 
                 // Smooth scroll
