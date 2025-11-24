@@ -6,19 +6,31 @@
 <body style="height:100vh; margin:0;">
   <audio id="bgMusic" src="https://raw.githubusercontent.com/SmartProfits/orderplus/main/pic/Taylor%20Swift%20-%20Last%20Christmas%20(Audio).mp3" loop muted></audio>
 
-  <script>
+   <script>
     const audio = document.getElementById('bgMusic');
 
-    // 页面加载时准备播放
-    audio.play().catch(() => {
-      // 如果浏览器阻止播放，不做任何事，等待用户点击
-    });
+    audio.play().catch(() => {});
 
-    // 点击页面任何地方解除静音并播放
+    function fadeInAudio(duration = 3000) {
+      audio.muted = false;
+      audio.volume = 0; // 从静音开始
+      audio.play();
+
+      const interval = 50; // 每 50ms 增加一次音量
+      const step = interval / duration;
+
+      const fade = setInterval(() => {
+        if (audio.volume < 1) {
+          audio.volume = Math.min(audio.volume + step, 1);
+        } else {
+          clearInterval(fade); // 音量到最大停止渐变
+        }
+      }, interval);
+    }
+
     function enableMusic() {
-      audio.muted = false; // 解除静音
-      audio.play();         // 播放音乐
-      document.removeEventListener('click', enableMusic); // 只触发一次
+      fadeInAudio(5000); // 3秒渐入
+      document.removeEventListener('click', enableMusic);
     }
 
     document.addEventListener('click', enableMusic);
