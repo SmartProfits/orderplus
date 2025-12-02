@@ -5,7 +5,7 @@
 
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <title>2026 SmartProfits</title>
+    <title>2026 Celebration Stock</title>
     
     <!-- Google Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -59,42 +59,50 @@
             100% { opacity: 0.5; }
         }
 
-        /* 漂浮的店铺卡片 */
+        /* 店铺卡片样式 */
         .floating-shop-card {
             position: absolute;
             top: 0;
             left: 0;
-            width: 90px;
-            background: rgba(20, 20, 25, 0.8);
-            backdrop-filter: blur(4px);
-            border: 1px solid rgba(255, 215, 0, 0.4);
-            border-radius: 8px;
-            padding: 5px;
+            width: 140px; 
+            background: rgba(25, 25, 35, 0.85); 
+            backdrop-filter: blur(6px);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            border-radius: 12px;
+            padding: 8px;
             text-align: center;
             cursor: pointer;
             pointer-events: auto;
             transform-origin: center center;
             display: none;
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
-            transition: opacity 0.5s;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.25);
+            transition: opacity 0.5s, transform 0.2s;
             will-change: transform;
             z-index: 105;
+        }
+        
+        /* 点击时的缩放效果 */
+        .floating-shop-card:active {
+            transform: scale(0.95);
         }
 
         .floating-shop-card img {
             width: 100%;
-            height: 50px;
+            height: 100px; 
             object-fit: contain;
-            margin-bottom: 2px;
+            margin-bottom: 5px;
+            background: rgba(255,255,255,0.05); 
+            border-radius: 6px;
         }
 
         .floating-shop-card .shop-name {
-            font-size: 10px;
-            color: #fff;
+            font-size: 13px; 
+            color: #ffd700; 
             font-weight: bold;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            margin-top: 2px;
         }
 
         .shop-container.original-list { display: none !important; }
@@ -164,7 +172,7 @@
         <div id="floating-shops-layer"></div>
     </div>
 
-    <!-- 主要内容区域 (保持不变) -->
+    <!-- 主要内容区域 -->
     <div id="mainAppContent" style="opacity: 0; transition: opacity 0.5s;">
         <h1 id="mainTitle" style="padding-top: 20px; display: none;">SmartProfits Stock Request</h1>
         
@@ -284,27 +292,43 @@
 
     <script>
         let selectedStore = "";
+        let isTransitioning = false; // 标记是否正在进行转场动画
 
-        // UI 切换逻辑
+        // 覆盖 UI 切换逻辑，增加2秒延迟和烟花效果
         window.startShopSelection = function(element, storeId) {
+            if (isTransitioning) return; // 防止重复点击
+            isTransitioning = true; // 开始转场
+
+            // 1. 选中 UI 反馈
             const radio = document.querySelector(`input[value="${storeId}"]`);
             if(radio) radio.checked = true;
-            
             selectedStore = storeId;
             document.getElementById('selectedShopDisplay').innerText = storeId.replace(/\*/g, '');
-            
-            const threeContainer = document.getElementById('three-container');
-            const afterShopSelection = document.getElementById('after-shop-selection');
-            const mainTitle = document.getElementById('mainTitle');
-            
-            threeContainer.classList.add('hide-3d');
+
+            // 2. 隐藏店铺卡片，让视野纯净地看烟花
+            document.querySelectorAll('.floating-shop-card').forEach(el => {
+                el.style.opacity = '0';
+                el.style.pointerEvents = 'none';
+            });
+            document.getElementById('three-ui').innerHTML = "<span style='color:#ffd700; font-size: 18px; font-weight:bold;'>CELEBRATING...</span>";
+
+            // 3. 延迟2秒后跳转
             setTimeout(() => {
-                threeContainer.style.display = 'none';
-                afterShopSelection.style.display = 'block';
-                mainTitle.style.display = 'block';
-                document.getElementById('categoryTitle').style.display = 'block';
-                document.getElementById('categoryContainer').style.display = 'grid';
-            }, 800);
+                const threeContainer = document.getElementById('three-container');
+                const afterShopSelection = document.getElementById('after-shop-selection');
+                const mainTitle = document.getElementById('mainTitle');
+                
+                threeContainer.classList.add('hide-3d');
+                
+                setTimeout(() => {
+                    threeContainer.style.display = 'none';
+                    afterShopSelection.style.display = 'block';
+                    mainTitle.style.display = 'block';
+                    document.getElementById('categoryTitle').style.display = 'block';
+                    document.getElementById('categoryContainer').style.display = 'grid';
+                    isTransitioning = false; // 结束转场状态
+                }, 800);
+            }, 2000); // 2000ms = 2秒
         };
 
         window.resetToShopSelection = function() {
@@ -321,12 +345,17 @@
             
             // 重置状态
             isExploded = false;
-            // 外部粒子归位
+            isTransitioning = false;
+            document.getElementById('three-ui').innerHTML = "Double Tap to Select Shop<br><span style='font-size:10px'>Happy New Year</span>";
+            
             if(material) gsap.to(material.uniforms.uMix, { value: 0.0, duration: 2 });
-            // 内部小粒子消失
             if(innerMaterial) gsap.to(innerMaterial.uniforms.uOpacity, { value: 0.0, duration: 1.5 });
             
-            document.querySelectorAll('.floating-shop-card').forEach(el => el.style.opacity = '0');
+            document.querySelectorAll('.floating-shop-card').forEach(el => {
+                el.style.display = 'none';
+                el.style.opacity = '0';
+                el.style.pointerEvents = 'auto';
+            });
         };
 
         firebase.auth().onAuthStateChanged((user) => {
@@ -340,15 +369,18 @@
 
         // --- 3D 核心代码 ---
         let scene, camera, renderer, controls, material;
-        let innerMaterial; // 内层粒子的材质
+        let innerMaterial; 
         let isExploded = false;
         let activeFireworks = [];
         let fireworkTexture;
 
         const CONFIG = {
-            particleCount: 8000, 
-            text: "2026", 
-            font: "Bold 200px Arial", 
+            particleCount: 10000, 
+            textLine1: "HAPPY",  
+            textLine2: "NEW YEAR", 
+            font: "Bold 130px Arial", 
+            innerText: "2026", // 新增：内层文字
+            innerFont: "Bold 180px Arial", // 新增：内层字体大小
             color1: new THREE.Color(0xffd700),
             color2: new THREE.Color(0x00ffff),
             scatterRadius: 300,
@@ -365,7 +397,7 @@
             scene.fog = new THREE.FogExp2(0x050505, 0.002);
 
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.z = 400;
+            camera.position.z = 450; 
 
             renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
@@ -380,8 +412,8 @@
 
             fireworkTexture = getFireworkTexture();
 
-            initParticles();       // 外层大字/散开粒子
-            initInnerParticles();  // 新增：内层小字粒子
+            initParticles();       
+            initInnerParticles();  
             initShopCards();
             animate();
 
@@ -400,9 +432,50 @@
             window.addEventListener('resize', onWindowResize, false);
         }
 
-        // --- 1. 外层粒子文字逻辑 ---
+        // 修改后的获取文字坐标函数，支持传入具体的文字内容列表
+        function getTextCoordinates(textLines, fontSize) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const width = 1200;
+            const height = 500; 
+            canvas.width = width; 
+            canvas.height = height; 
+            
+            ctx.font = fontSize || CONFIG.font;
+            ctx.fillStyle = 'white';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            if (textLines.length === 1) {
+                // 如果只有一行字 (比如 "2026")，居中显示
+                ctx.fillText(textLines[0], width / 2, height / 2);
+            } else {
+                // 如果有两行字，分开显示
+                ctx.fillText(textLines[0], width / 2, height * 0.35);
+                ctx.fillText(textLines[1], width / 2, height * 0.75);
+            }
+            
+            const imageData = ctx.getImageData(0,0,width,height);
+            const data = imageData.data;
+            const coords = [];
+            const step = 4; 
+
+            for(let y=0; y<height; y+=step) {
+                for(let x=0; x<width; x+=step) {
+                    if(data[(y*width+x)*4+3] > 128) {
+                        coords.push({
+                            x: (x - width/2) * 1.0, 
+                            y: (height/2 - y) * 1.0
+                        });
+                    }
+                }
+            }
+            return coords;
+        }
+
         function initParticles() {
-            const coords = getTextCoordinates(CONFIG.text);
+            // 外层：传入 Happy New Year
+            const coords = getTextCoordinates([CONFIG.textLine1, CONFIG.textLine2], CONFIG.font); 
             const totalPoints = CONFIG.particleCount;
             
             const positions = new Float32Array(totalPoints * 3);
@@ -465,7 +538,6 @@
                     void main() {
                         vColor = color;
                         vec3 pos = mix(targetPos, randomPos, uMix);
-                        // 呼吸频率调低到 0.5 (很慢)，幅度降低到 0.5 (很微弱)
                         float wave = sin(uTime * 0.5 + aOffset) * (0.5 + uMix * 5.0);
                         pos += normalize(pos) * wave;
                         vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
@@ -490,10 +562,11 @@
             scene.add(particles);
         }
 
-        // --- 新增：内层小粒子文字逻辑 ---
+        // --- 内层粒子逻辑：改为 2026 ---
         function initInnerParticles() {
-            const coords = getTextCoordinates(CONFIG.text);
-            const totalPoints = Math.floor(CONFIG.particleCount * 0.6); // 稍微少一点点粒子
+            // 关键修改：传入 ["2026"]
+            const coords = getTextCoordinates([CONFIG.innerText], CONFIG.innerFont); 
+            const totalPoints = Math.floor(CONFIG.particleCount * 0.5); // 粒子数
             
             const positions = new Float32Array(totalPoints * 3);
             const colors = new Float32Array(totalPoints * 3);
@@ -506,13 +579,11 @@
             for (let i = 0; i < totalPoints; i++) {
                 const coord = coords[i % coords.length];
                 
-                // 关键点：缩小比例 0.35倍
-                const scale = 0.35;
+                const scale = 0.5; // 2026 稍微大一点
                 positions[i*3] = coord.x * scale;
                 positions[i*3+1] = coord.y * scale;
                 positions[i*3+2] = (Math.random() - 0.5) * 20;
 
-                // 颜色：金黄混白色
                 const mixedColor = new THREE.Color().lerpColors(gold, white, Math.random() * 0.5);
                 colors[i*3] = mixedColor.r;
                 colors[i*3+1] = mixedColor.g;
@@ -531,7 +602,7 @@
                 uniforms: {
                     uTime: { value: 0 },
                     uPixelRatio: { value: renderer.getPixelRatio() },
-                    uOpacity: { value: 0.0 } // 初始完全透明
+                    uOpacity: { value: 0.0 }
                 },
                 vertexShader: `
                     uniform float uTime;
@@ -543,7 +614,6 @@
                     void main() {
                         vColor = color;
                         vec3 pos = position;
-                        // 内层粒子微弱浮动
                         pos.y += sin(uTime + aOffset) * 1.5;
                         vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
                         gl_Position = projectionMatrix * mvPosition;
@@ -554,10 +624,9 @@
                     uniform float uOpacity;
                     varying vec3 vColor;
                     void main() {
-                        if (uOpacity <= 0.01) discard; // 优化性能
+                        if (uOpacity <= 0.01) discard;
                         float r = distance(gl_PointCoord, vec2(0.5));
                         if (r > 0.5) discard;
-                        // 增加一点发光感
                         gl_FragColor = vec4(vColor, uOpacity); 
                     }
                 `,
@@ -568,32 +637,6 @@
 
             const particles = new THREE.Points(geometry, innerMaterial);
             scene.add(particles);
-        }
-
-        function getTextCoordinates(text) {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = 1200; canvas.height = 400; 
-            ctx.font = CONFIG.font;
-            ctx.fillStyle = 'white';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(text, 600, 200);
-            
-            const imageData = ctx.getImageData(0,0,1200,400);
-            const data = imageData.data;
-            const coords = [];
-            for(let y=0; y<400; y+=4) {
-                for(let x=0; x<1200; x+=4) {
-                    if(data[(y*1200+x)*4+3] > 128) {
-                        coords.push({
-                            x: (x - 600) * 1.0, 
-                            y: (200 - y) * 1.0
-                        });
-                    }
-                }
-            }
-            return coords;
         }
 
         function getFireworkTexture() {
@@ -721,13 +764,13 @@
             const originalData = document.querySelectorAll('.shop-data');
             const phi = Math.PI * (3 - Math.sqrt(5)); 
             const count = originalData.length;
-            const radius = 250; 
+            const radius = 280; 
 
             originalData.forEach((data, i) => {
                 const card = document.createElement('div');
                 card.className = 'floating-shop-card';
                 card.innerHTML = `
-                    <img src="${data.dataset.img}" onerror="this.src='https://placehold.co/100?text=Shop'">
+                    <img src="${data.dataset.img}" onerror="this.src='https://placehold.co/140x100?text=Shop'">
                     <div class="shop-name">${data.dataset.name}</div>
                 `;
                 card.onclick = () => startShopSelection(card, data.dataset.id);
@@ -743,31 +786,29 @@
         }
 
         function toggleExplosion() {
+            if (isTransitioning) return; // 转场时不处理双击
+
             isExploded = !isExploded;
             
-            // 1. 外层粒子爆炸/散开
             gsap.to(material.uniforms.uMix, {
                 value: isExploded ? 1.0 : 0.0,
                 duration: 2.5,
                 ease: "power2.inOut"
             });
 
-            // 2. 内层小粒子显现 (淡入/淡出)
             if (innerMaterial) {
                 gsap.to(innerMaterial.uniforms.uOpacity, {
-                    value: isExploded ? 1.0 : 0.0, // 散开时显示(1), 聚合时隐藏(0)
-                    duration: isExploded ? 3.0 : 1.5, // 显现慢一点，消失快一点
+                    value: isExploded ? 1.0 : 0.0, 
+                    duration: isExploded ? 3.0 : 1.5,
                     ease: "power2.inOut"
                 });
             }
 
-            // 3. 相机控制
             gsap.to(controls, {
                 autoRotateSpeed: isExploded ? 0.2 : 1.0,
                 duration: 1
             });
 
-            // 4. 店铺卡片逻辑
             const cards = document.querySelectorAll('.floating-shop-card');
             cards.forEach((card, i) => {
                 if(isExploded) {
@@ -781,7 +822,7 @@
             
             document.querySelector('#three-ui').innerHTML = isExploded 
                 ? "Click a Card to Select<br><span style='font-size:10px'>Double tap to Back</span>" 
-                : "Double Tap to Select Shop<br><span style='font-size:10px'>2026 Celebration</span>";
+                : "Double Tap to Select Shop<br><span style='font-size:10px'>Happy New Year</span>";
         }
 
         function onWindowResize() {
@@ -798,9 +839,15 @@
             const time = performance.now() * 0.001;
             
             if(material) material.uniforms.uTime.value = time;
-            if(innerMaterial) innerMaterial.uniforms.uTime.value = time; // 更新内层粒子时间
+            if(innerMaterial) innerMaterial.uniforms.uTime.value = time;
 
-            if (Math.random() < CONFIG.fireworkChance) activeFireworks.push(new Firework(scene));
+            // --- 烟花逻辑修改 ---
+            // 正常几率 0.03，转场时 0.4 (极大增加烟花密度)
+            let chance = CONFIG.fireworkChance;
+            if (isTransitioning) chance = 0.8;
+
+            if (Math.random() < chance) activeFireworks.push(new Firework(scene));
+            
             for (let i = activeFireworks.length - 1; i >= 0; i--) {
                 const fw = activeFireworks[i];
                 fw.update();
@@ -810,7 +857,8 @@
             controls.update();
             renderer.render(scene, camera);
 
-            if(isExploded) updateShopCardPositions();
+            // 转场时不用更新卡片位置（已经隐藏）
+            if(isExploded && !isTransitioning) updateShopCardPositions();
         }
 
         function updateShopCardPositions() {
