@@ -1,3 +1,4 @@
+<!-- START OF FILE 2026v2.html -->
 <!DOCTYPE html>
 <html lang="zh">
 <head>
@@ -37,7 +38,6 @@
         
         canvas { display: block; }
 
-        /* 3D 场景 UI 提示 */
         #three-ui {
             position: absolute;
             bottom: 100px;
@@ -59,12 +59,12 @@
             100% { opacity: 0.5; }
         }
 
-        /* 店铺卡片样式 */
+        /* --- 修改：店铺卡片样式 --- */
         .floating-shop-card {
             position: absolute;
             top: 0;
             left: 0;
-            width: 140px; 
+            width: 210px; 
             background: rgba(25, 25, 35, 0.85); 
             backdrop-filter: blur(6px);
             border: 1px solid rgba(255, 215, 0, 0.5);
@@ -76,19 +76,19 @@
             transform-origin: center center;
             display: none;
             box-shadow: 0 0 20px rgba(255, 215, 0, 0.25);
-            transition: opacity 0.5s, transform 0.2s;
-            will-change: transform;
+            opacity: 0; /* 初始完全透明 */
+            transition: opacity 1.2s ease-out, transform 0.2s;
+            will-change: transform, opacity;
             z-index: 105;
         }
         
-        /* 点击时的缩放效果 */
         .floating-shop-card:active {
             transform: scale(0.95);
         }
 
         .floating-shop-card img {
             width: 100%;
-            height: 100px; 
+            height: 135px; 
             object-fit: contain;
             margin-bottom: 5px;
             background: rgba(255,255,255,0.05); 
@@ -96,7 +96,7 @@
         }
 
         .floating-shop-card .shop-name {
-            font-size: 13px; 
+            font-size: 21px; 
             color: #ffd700; 
             font-weight: bold;
             white-space: nowrap;
@@ -124,14 +124,14 @@
     <!-- SPLASH SCREEN -->
     <div id="splashScreen">
         <div class="splash-content">
-            <span class="material-icons-round splash-logo-icon">rocket_launch</span>
-            <h1 class="splash-title">SmartProfits</h1>
-            <div class="splash-subtitle">2026 Edition</div>
+            <span class="material-icons-round splash-logo-icon">auto_awesome</span>
+            <h1 class="splash-title">Happy New Year</h1>
+            <div class="splash-subtitle">2026</div>
             <div class="splash-loader"></div>
         </div>
     </div>
 
-    <!-- 认证容器 (保持不变) -->
+    <!-- 认证容器 -->
     <div id="authContainer" class="auth-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; z-index: 9999;">
         <div class="auth-box" style="width: 90%; max-width: 400px;">
             <h2 id="authTitle" style="text-align: center;">Welcome Back</h2>
@@ -292,27 +292,30 @@
 
     <script>
         let selectedStore = "";
-        let isTransitioning = false; // 标记是否正在进行转场动画
+        let isTransitioning = false; 
 
-        // 覆盖 UI 切换逻辑，增加2秒延迟和烟花效果
         window.startShopSelection = function(element, storeId) {
-            if (isTransitioning) return; // 防止重复点击
-            isTransitioning = true; // 开始转场
+            if (isTransitioning) return; 
+            isTransitioning = true; 
 
-            // 1. 选中 UI 反馈
             const radio = document.querySelector(`input[value="${storeId}"]`);
             if(radio) radio.checked = true;
             selectedStore = storeId;
             document.getElementById('selectedShopDisplay').innerText = storeId.replace(/\*/g, '');
 
-            // 2. 隐藏店铺卡片，让视野纯净地看烟花
+            // 1. 隐藏 UI
             document.querySelectorAll('.floating-shop-card').forEach(el => {
                 el.style.opacity = '0';
                 el.style.pointerEvents = 'none';
             });
             document.getElementById('three-ui').innerHTML = "<span style='color:#ffd700; font-size: 18px; font-weight:bold;'>CELEBRATING...</span>";
 
-            // 3. 延迟2秒后跳转
+            // 2. 发射店铺名字专用烟花 (白色粒子)
+            // 提取店铺纯名
+            const cleanName = storeId.replace(/\*/g, '');
+            launchShopNameFirework(cleanName);
+
+            // 3. 过渡到主页面
             setTimeout(() => {
                 const threeContainer = document.getElementById('three-container');
                 const afterShopSelection = document.getElementById('after-shop-selection');
@@ -326,9 +329,9 @@
                     mainTitle.style.display = 'block';
                     document.getElementById('categoryTitle').style.display = 'block';
                     document.getElementById('categoryContainer').style.display = 'grid';
-                    isTransitioning = false; // 结束转场状态
+                    isTransitioning = false; 
                 }, 800);
-            }, 2000); // 2000ms = 2秒
+            }, 5000); // 维持5秒过渡期，与原逻辑一致，烟花在3.5秒内完成
         };
 
         window.resetToShopSelection = function() {
@@ -343,7 +346,6 @@
             void threeContainer.offsetWidth; 
             threeContainer.classList.remove('hide-3d');
             
-            // 重置状态
             isExploded = false;
             isTransitioning = false;
             document.getElementById('three-ui').innerHTML = "Double Tap to Select Shop<br><span style='font-size:10px'>Happy New Year</span>";
@@ -379,8 +381,8 @@
             textLine1: "HAPPY",  
             textLine2: "NEW YEAR", 
             font: "Bold 130px Arial", 
-            innerText: "2026", // 新增：内层文字
-            innerFont: "Bold 180px Arial", // 新增：内层字体大小
+            innerText: "2026", 
+            innerFont: "Bold 180px Arial", 
             color1: new THREE.Color(0xffd700),
             color2: new THREE.Color(0x00ffff),
             scatterRadius: 300,
@@ -432,7 +434,148 @@
             window.addEventListener('resize', onWindowResize, false);
         }
 
-        // 修改后的获取文字坐标函数，支持传入具体的文字内容列表
+        // --- 新增：专门用于生成白色名字烟花的函数 ---
+        function launchShopNameFirework(text) {
+            // 1. 生成目标文字的坐标点
+            const textCoords = getSmartTextCoordinates(text);
+            const rocketStart = new THREE.Vector3(0, -300, 0);
+            const explosionCenter = new THREE.Vector3(0, 50, 0); // 在屏幕中心偏上爆炸
+
+            // 2. 创建升空的白色粒子 (Rocket)
+            const rocketGeo = new THREE.BufferGeometry().setFromPoints([rocketStart]);
+            const rocketMat = new THREE.PointsMaterial({
+                size: 15,
+                color: 0xffffff, // 纯白
+                map: fireworkTexture,
+                transparent: true,
+                blending: THREE.AdditiveBlending,
+                depthWrite: false
+            });
+            const rocket = new THREE.Points(rocketGeo, rocketMat);
+            scene.add(rocket);
+
+            // 3. 升空动画 (1秒)
+            const rocketPos = { y: rocketStart.y };
+            gsap.to(rocketPos, {
+                y: explosionCenter.y,
+                duration: 1.0,
+                ease: "power2.out",
+                onUpdate: () => {
+                    rocket.geometry.attributes.position.setY(0, rocketPos.y);
+                    rocket.geometry.attributes.position.needsUpdate = true;
+                },
+                onComplete: () => {
+                    // 4. 到达顶部，移除Rocket，生成文字粒子
+                    scene.remove(rocket);
+                    explodeIntoText(textCoords, explosionCenter);
+                }
+            });
+        }
+
+        // --- 新增：文字爆炸逻辑 ---
+        function explodeIntoText(coords, centerPos) {
+            const count = coords.length;
+            const positions = new Float32Array(count * 3);
+            
+            // 初始所有点都在爆炸中心
+            for(let i=0; i<count; i++) {
+                positions[i*3] = centerPos.x;
+                positions[i*3+1] = centerPos.y;
+                positions[i*3+2] = centerPos.z;
+            }
+
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+            const material = new THREE.PointsMaterial({
+                size: 5, // 粒子大小
+                color: 0xffffff, // 纯白
+                map: fireworkTexture,
+                transparent: true,
+                opacity: 1.0,
+                blending: THREE.AdditiveBlending,
+                depthWrite: false
+            });
+
+            const textSystem = new THREE.Points(geometry, material);
+            scene.add(textSystem);
+
+            // 5. 粒子扩散成文字形状 (0.8秒)
+            // 我们不直接用GSAP数组tween，这太慢。我们用一个对象记录进度
+            const anim = { progress: 0 };
+            
+            gsap.to(anim, {
+                progress: 1,
+                duration: 0.8,
+                ease: "back.out(1.2)", // 带一点弹性的爆炸感
+                onUpdate: () => {
+                    const posAttr = textSystem.geometry.attributes.position;
+                    const p = anim.progress;
+                    for(let i=0; i<count; i++) {
+                        const target = coords[i];
+                        // 从中心插值到目标点
+                        const x = centerPos.x + (target.x * p);
+                        const y = centerPos.y + (target.y * p);
+                        const z = centerPos.z + (target.z * p);
+                        posAttr.setXYZ(i, x, y, z);
+                    }
+                    posAttr.needsUpdate = true;
+                },
+                onComplete: () => {
+                    // 6. 停留一小会，然后消失
+                    gsap.to(material, {
+                        opacity: 0,
+                        duration: 1.5, // 慢慢消失
+                        delay: 0.5,    // 停留0.5秒
+                        onComplete: () => {
+                            scene.remove(textSystem);
+                            geometry.dispose();
+                            material.dispose();
+                        }
+                    });
+                }
+            });
+        }
+
+        // --- 新增：智能文字坐标生成 (适应不同长度的店铺名) ---
+        function getSmartTextCoordinates(text) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const width = 1024;
+            const height = 256;
+            canvas.width = width;
+            canvas.height = height;
+
+            // 根据字数调整字体大小
+            let fontSize = 100;
+            if (text.length > 10) fontSize = 70; 
+            if (text.length > 15) fontSize = 50;
+
+            ctx.font = `Bold ${fontSize}px Arial`;
+            ctx.fillStyle = 'white';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text, width / 2, height / 2);
+
+            const imageData = ctx.getImageData(0, 0, width, height);
+            const data = imageData.data;
+            const coords = [];
+            const step = 2; // 采样密度，越小越密
+
+            for(let y = 0; y < height; y += step) {
+                for(let x = 0; x < width; x += step) {
+                    if(data[(y * width + x) * 4 + 3] > 128) {
+                        coords.push({
+                            x: (x - width / 2) * 1.5, // 适当放大
+                            y: (height / 2 - y) * 1.5,
+                            z: (Math.random() - 0.5) * 5 // 增加一点点厚度
+                        });
+                    }
+                }
+            }
+            return coords;
+        }
+
         function getTextCoordinates(textLines, fontSize) {
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
@@ -447,10 +590,8 @@
             ctx.textBaseline = 'middle';
             
             if (textLines.length === 1) {
-                // 如果只有一行字 (比如 "2026")，居中显示
                 ctx.fillText(textLines[0], width / 2, height / 2);
             } else {
-                // 如果有两行字，分开显示
                 ctx.fillText(textLines[0], width / 2, height * 0.35);
                 ctx.fillText(textLines[1], width / 2, height * 0.75);
             }
@@ -474,7 +615,6 @@
         }
 
         function initParticles() {
-            // 外层：传入 Happy New Year
             const coords = getTextCoordinates([CONFIG.textLine1, CONFIG.textLine2], CONFIG.font); 
             const totalPoints = CONFIG.particleCount;
             
@@ -562,11 +702,9 @@
             scene.add(particles);
         }
 
-        // --- 内层粒子逻辑：改为 2026 ---
         function initInnerParticles() {
-            // 关键修改：传入 ["2026"]
             const coords = getTextCoordinates([CONFIG.innerText], CONFIG.innerFont); 
-            const totalPoints = Math.floor(CONFIG.particleCount * 0.5); // 粒子数
+            const totalPoints = Math.floor(CONFIG.particleCount * 0.5); 
             
             const positions = new Float32Array(totalPoints * 3);
             const colors = new Float32Array(totalPoints * 3);
@@ -579,7 +717,7 @@
             for (let i = 0; i < totalPoints; i++) {
                 const coord = coords[i % coords.length];
                 
-                const scale = 0.5; // 2026 稍微大一点
+                const scale = 0.5; 
                 positions[i*3] = coord.x * scale;
                 positions[i*3+1] = coord.y * scale;
                 positions[i*3+2] = (Math.random() - 0.5) * 20;
@@ -786,7 +924,7 @@
         }
 
         function toggleExplosion() {
-            if (isTransitioning) return; // 转场时不处理双击
+            if (isTransitioning) return;
 
             isExploded = !isExploded;
             
@@ -810,15 +948,24 @@
             });
 
             const cards = document.querySelectorAll('.floating-shop-card');
-            cards.forEach((card, i) => {
-                if(isExploded) {
-                    card.style.display = 'block';
-                    setTimeout(() => card.style.opacity = 1, 500 + i * 100);
-                } else {
+            
+            if(isExploded) {
+                // 修改点：延迟2.2秒后，卡片才逐个出现
+                setTimeout(() => {
+                    cards.forEach((card, i) => {
+                        card.style.display = 'block';
+                        // 使用CSS transition配合延时
+                        setTimeout(() => {
+                            card.style.opacity = 1;
+                        }, i * 150); // 逐个出现
+                    });
+                }, 2200);
+            } else {
+                cards.forEach((card) => {
                     card.style.opacity = 0;
                     setTimeout(() => card.style.display = 'none', 500);
-                }
-            });
+                });
+            }
             
             document.querySelector('#three-ui').innerHTML = isExploded 
                 ? "Click a Card to Select<br><span style='font-size:10px'>Double tap to Back</span>" 
@@ -841,10 +988,8 @@
             if(material) material.uniforms.uTime.value = time;
             if(innerMaterial) innerMaterial.uniforms.uTime.value = time;
 
-            // --- 烟花逻辑修改 ---
-            // 正常几率 0.03，转场时 0.4 (极大增加烟花密度)
             let chance = CONFIG.fireworkChance;
-            if (isTransitioning) chance = 0.8;
+            if (isTransitioning) chance = 0.4;
 
             if (Math.random() < chance) activeFireworks.push(new Firework(scene));
             
@@ -857,7 +1002,6 @@
             controls.update();
             renderer.render(scene, camera);
 
-            // 转场时不用更新卡片位置（已经隐藏）
             if(isExploded && !isTransitioning) updateShopCardPositions();
         }
 
@@ -875,9 +1019,8 @@
                     const scale = Math.max(0.5, 1 - pos.z); 
                     item.dom.style.transform = `translate(-50%, -50%) translate3d(${x}px, ${y}px, 0) scale(${scale})`;
                     item.dom.style.zIndex = Math.floor((1 - pos.z) * 100); 
-                    item.dom.style.display = 'block';
-                } else {
-                    item.dom.style.display = 'none';
+                    // 这里不做 display 控制，交给 toggleExplosion 的逻辑
+                    // 仅更新位置
                 }
             });
         }
