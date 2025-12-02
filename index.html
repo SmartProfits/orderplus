@@ -376,11 +376,13 @@
         let activeFireworks = [];
         let fireworkTexture;
 
+        // --- 修改 1: 更新配置为三行 ---
         const CONFIG = {
             particleCount: 10000, 
             textLine1: "HAPPY",  
-            textLine2: "NEW YEAR", 
-            font: "Bold 130px Arial", 
+            textLine2: "NEW",    // 修改这里
+            textLine3: "YEAR",   // 新增这里
+            font: "Bold 90px Arial", 
             innerText: "2026", 
             innerFont: "Bold 180px Arial", 
             color1: new THREE.Color(0xffd700),
@@ -576,6 +578,7 @@
             return coords;
         }
 
+        // --- 修改 2: 更新文字坐标获取逻辑以支持3行 ---
         function getTextCoordinates(textLines, fontSize) {
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
@@ -591,9 +594,14 @@
             
             if (textLines.length === 1) {
                 ctx.fillText(textLines[0], width / 2, height / 2);
-            } else {
+            } else if (textLines.length === 2) {
                 ctx.fillText(textLines[0], width / 2, height * 0.35);
                 ctx.fillText(textLines[1], width / 2, height * 0.75);
+            } else {
+                // 三行文字排版
+                ctx.fillText(textLines[0], width / 2, height * 0.22);
+                ctx.fillText(textLines[1], width / 2, height * 0.50);
+                ctx.fillText(textLines[2], width / 2, height * 0.78);
             }
             
             const imageData = ctx.getImageData(0,0,width,height);
@@ -615,7 +623,8 @@
         }
 
         function initParticles() {
-            const coords = getTextCoordinates([CONFIG.textLine1, CONFIG.textLine2], CONFIG.font); 
+            // --- 修改 3: 传入三行文字 ---
+            const coords = getTextCoordinates([CONFIG.textLine1, CONFIG.textLine2, CONFIG.textLine3], CONFIG.font); 
             const totalPoints = CONFIG.particleCount;
             
             const positions = new Float32Array(totalPoints * 3);
